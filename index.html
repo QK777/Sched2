@@ -476,15 +476,13 @@
 
     .time-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 3%;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       align-items: end;
-      width: 100%;
     }
 
     .time-field {
       min-width: 0;
-      width: 100%;
     }
 
     .time-field label {
@@ -498,19 +496,19 @@
     .time-picker {
       width: 100%;
       display: grid;
-      grid-template-columns: 44% 8% 44%;
+      grid-template-columns: 43% 8% 43%;
       align-items: center;
-      gap: 2%;
+      gap: 3%;
       border: 1px solid var(--border);
       background: #10131b;
       border-radius: 12px;
-      padding: 6%;
+      padding: 6px;
     }
 
     .time-picker span {
       color: var(--muted);
       font-weight: 900;
-      font-size: clamp(13px, 4vw, 16px);
+      font-size: 16px;
       line-height: 1;
       text-align: center;
     }
@@ -518,13 +516,13 @@
     .time-picker select {
       width: 100%;
       min-width: 0;
-      height: 2.6em;
-      padding: 0;
+      height: 38px;
+      padding: 0 2px;
       border: 0;
       border-radius: 8px;
       background: rgba(255,255,255,0.04);
       color: var(--text);
-      font-size: clamp(13px, 4vw, 16px);
+      font-size: 16px;
       font-weight: 850;
       text-align: center;
       text-align-last: center;
@@ -534,31 +532,36 @@
 
     @media (max-width: 390px) {
       .time-row {
-        gap: 2.5%;
+        gap: 8px;
       }
 
       .time-picker {
-        padding: 5%;
-        grid-template-columns: 43% 8% 43%;
-        gap: 3%;
+        padding: 5px;
+        grid-template-columns: 42% 8% 42%;
+        gap: 4%;
       }
 
       .time-picker select {
-        height: 2.5em;
+        height: 36px;
+        font-size: 15px;
+        padding: 0 1px;
       }
     }
 
     @media (max-width: 350px) {
       .time-row {
-        gap: 2%;
+        gap: 6px;
       }
 
       .time-picker {
-        padding: 4%;
+        padding: 4px;
+        grid-template-columns: 42% 8% 42%;
+        gap: 4%;
       }
 
       .time-picker select {
-        height: 2.4em;
+        height: 34px;
+        font-size: 14px;
       }
     }
 
