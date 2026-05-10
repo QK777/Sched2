@@ -1,0 +1,1428 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cleaning Calendar</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192-android.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512-android.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f1117">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Cleaning Calendar">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel: #171a22;
+      --panel2: #20242f;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #2d3340;
+      --accent: #6aa6ff;
+      --cellw: 94px;
+      --leftw: 176px;
+      --headh: 58px;
+      --rowh: 96px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: var(--panel2);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .app {
+      height: 100dvh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      z-index: 30;
+      padding: 10px 10px 8px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15, 17, 23, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .month-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .month-title {
+      text-align: center;
+      font-weight: 850;
+      font-size: 18px;
+    }
+
+    .top-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .top-actions button {
+      padding: 9px 4px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .calendar-scroll {
+      height: 100%;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: pan-x pan-y;
+      overscroll-behavior: contain;
+    }
+
+    .calendar-scroll.dragging {
+      cursor: grabbing;
+    }
+
+    .calendar-scroll * {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: var(--leftw) repeat(var(--days), var(--cellw));
+      grid-template-rows: var(--headh) repeat(var(--rows), var(--rowh));
+      width: max-content;
+      min-width: 100%;
+    }
+
+    .corner,
+    .date-head,
+    .left-cell,
+    .cal-cell {
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .corner {
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 25;
+      background: rgba(17, 20, 29, 0.98);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .corner-add {
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      padding: 0;
+      border-radius: 999px;
+      background: rgba(106,166,255,.18);
+      border: 1px solid rgba(106,166,255,.38);
+      color: var(--text);
+      font-size: 19px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .date-head {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(17, 20, 29, 0.98);
+      display: grid;
+      place-items: center;
+      padding: 4px;
+      min-width: var(--cellw);
+    }
+
+    .date-head.today {
+      background: rgba(106, 166, 255, 0.16);
+    }
+
+    .date-num {
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .date-week {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.1;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    .date-head.sun .date-week { color: #ff9aa2; }
+    .date-head.sat .date-week { color: #8bbcff; }
+
+    .left-cell {
+      position: sticky;
+      left: 0;
+      z-index: 15;
+      background: rgba(17, 20, 29, 0.98);
+      padding: 8px 8px 8px 10px;
+      overflow: hidden;
+      display: grid;
+      align-content: center;
+      gap: 3px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .left-cell.activity {
+      background: rgba(32, 36, 47, 0.98);
+    }
+
+    .left-cell.long-pressing {
+      outline: 2px solid rgba(106,166,255,.7);
+      outline-offset: -3px;
+    }
+
+    .item-name {
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .item-sub {
+      font-size: 11px;
+      color: #d1d5db;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .item-address {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .item-key {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.15;
+    }
+
+    .cal-cell {
+      min-width: var(--cellw);
+      height: var(--rowh);
+      padding: 5px;
+      background: rgba(255,255,255,0.018);
+      position: relative;
+      cursor: default;
+      touch-action: manipulation;
+    }
+
+    .cal-cell:nth-child(odd) {
+      background: rgba(255,255,255,0.026);
+    }
+
+    .cal-cell.has-event {
+      background: rgba(106, 166, 255, 0.05);
+    }
+
+    .mini-card {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--card-color, rgba(106,166,255,.28));
+      padding: 6px;
+      overflow: hidden;
+      color: #f8fafc;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 5px;
+    }
+
+    .mini-content {
+      font-size: 20px;
+      font-weight: 950;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .mini-line {
+      width: 100%;
+      color: rgba(255,255,255,.9);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-placeholder {
+      font-size: 14px;
+      color: rgba(255,255,255,.75);
+    }
+
+    .activity-card {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      display: grid;
+      place-items: center;
+      padding: 4px;
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+      white-space: nowrap;
+      line-height: 1.12;
+    }
+
+    .activity-card.has-time {
+      color: var(--text);
+      background: rgba(250, 204, 21, 0.16);
+      border: 1px solid rgba(250, 204, 21, 0.25);
+    }
+
+    .activity-tilde {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0,0,0,.56);
+      display: none;
+    }
+
+    .sheet-backdrop.show { display: block; }
+
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-height: 92dvh;
+      overflow: auto;
+      padding: 16px;
+      border-radius: 22px 22px 0 0;
+      border-top: 1px solid rgba(255,255,255,.12);
+      background: rgba(23, 26, 34, .96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .sheet h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .sheet-close {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      font-size: 22px;
+      display: grid;
+      place-items: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 10px 0 4px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      max-width: 100%;
+      border: 1px solid var(--border);
+      background: #10131b;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 0.72fr;
+      gap: 8px;
+    }
+
+    .time-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .palette {
+      display: flex;
+      gap: 10px;
+      padding: 4px 0 2px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .palette::-webkit-scrollbar { display: none; }
+
+    .color-dot {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 999px;
+      border: 3px solid transparent;
+      padding: 0;
+      background: var(--dot);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.18);
+    }
+
+    .color-dot.selected {
+      border-color: #fff;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .delete {
+      background: #3a1d22;
+      color: #ff9aa2;
+    }
+
+    .save {
+      background: var(--accent);
+      color: #06101f;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 8px;
+    }
+
+    @media (min-width: 820px) {
+      :root {
+        --cellw: 104px;
+        --leftw: 220px;
+      }
+
+      body {
+        max-width: 1100px;
+        margin: 0 auto;
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="month-row">
+      <button id="prevMonthBtn">＜</button>
+      <div class="month-title" id="monthTitle">2026年5月</div>
+      <button id="nextMonthBtn">＞</button>
+    </div>
+    <div class="top-actions">
+      <button id="todayBtn">今日</button>
+      <button id="exportBtn">バックアップ</button>
+      <button id="importBtn">復元</button>
+    </div>
+    <input id="importFile" type="file" accept="application/json" hidden>
+  </header>
+
+  <main class="calendar-scroll" id="calendarScroll">
+    <div class="calendar-grid" id="calendarGrid"></div>
+
+  </main>
+</div>
+
+<div class="sheet-backdrop" id="eventSheetBackdrop">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2 id="eventSheetTitle">予定を編集</h2>
+      <button class="sheet-close" id="eventCloseBtn" type="button">×</button>
+    </div>
+
+    <input type="hidden" id="editingDate">
+    <input type="hidden" id="editingItemId">
+
+    <label>カード枠の色</label>
+    <div class="palette" id="colorPalette"></div>
+
+    <div class="form-row">
+      <div>
+        <label>人数</label>
+        <select id="eventPeopleInput"></select>
+      </div>
+      <div>
+        <label>利用者</label>
+        <input id="eventUserInput" placeholder="例：山田">
+      </div>
+    </div>
+
+    <label>担当者</label>
+    <input id="eventStaffInput" placeholder="例：田中">
+
+    <label>メモ</label>
+    <textarea id="eventNoteInput" placeholder="備考"></textarea>
+
+    <div class="actions">
+      <button class="delete" id="eventDeleteBtn">削除</button>
+      <button class="save" id="eventSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="itemSheetBackdrop">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2 id="itemSheetTitle">項目を編集</h2>
+      <button class="sheet-close" id="itemCloseBtn" type="button">×</button>
+    </div>
+
+    <input type="hidden" id="editingItemSheetId">
+
+    <label>場所・物件</label>
+    <input id="itemNameInput" placeholder="例：レイクウエスト 4-711">
+
+    <label>建物名・屋号など</label>
+    <input id="itemSubInput" placeholder="例：ウエストヒルズ邸">
+
+    <label>住所・番号など</label>
+    <input id="itemAddressInput" placeholder="例：1049-3">
+
+    <label>鍵番号</label>
+    <input id="itemKeyInput" placeholder="後で追加可能">
+
+    <div class="hint">左側の項目は長押しで編集できます。項目名を空にして保存すると削除します。</div>
+
+    <div class="actions">
+      <button class="delete" id="itemDeleteBtn">削除</button>
+      <button class="save" id="itemSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="activitySheetBackdrop">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>活動時間</h2>
+      <button class="sheet-close" id="activityCloseBtn" type="button">×</button>
+    </div>
+
+    <input type="hidden" id="activityDateInput">
+
+    <label>日付</label>
+    <input id="activityInfoInput" readonly>
+
+    <div class="time-row">
+      <div>
+        <label>開始時間</label>
+        <input type="time" id="activityStartInput">
+      </div>
+      <div>
+        <label>終了時間</label>
+        <input type="time" id="activityEndInput">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="delete" id="activityDeleteBtn">削除</button>
+      <button class="save" id="activitySaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = "cleaning_calendar_grid_v1";
+
+  const COLORS = [
+    "#6aa6ff55",
+    "#ff5b5b55",
+    "#ffd16666",
+    "#7bd88f55",
+    "#c084fc55",
+    "#ff9f4355",
+    "#4dd4ac55"
+  ];
+
+  const CONTENTS = [
+    "日帰り",
+    "連泊（チェックイン）",
+    "連泊（清掃）",
+    "連泊（チェックアウト）"
+  ];
+
+  const DEFAULT_ITEMS = [
+    { id: "activity", type: "activity", name: "活動時間", sub: "", address: "", key: "" },
+    { id: "place_lakewest_4711", type: "place", name: "レイクウエスト 4-711", sub: "ウエストヒルズ邸", address: "1049-3", key: "" },
+    { id: "place_kohan_sauna_4656", type: "place", name: "湖辺のくつろぎ、時々サウナ (4-656)", sub: "由井邸", address: "1039-7", key: "" },
+    { id: "place_lake_terrace_6904", type: "place", name: "LAKE Terrace 6-904", sub: "早坂邸", address: "1432-179", key: "" },
+    { id: "place_takashima_best_so", type: "place", name: "TAKASHIMA BEST SO (4-625/626)", sub: "加藤邸", address: "1039-90", key: "" },
+    { id: "place_fusha_biwako_1011", type: "place", name: "風車村 びわ湖の家 1011 (4-657)", sub: "伊藤邸", address: "1039-96", key: "" },
+    { id: "place_koco_1220", type: "place", name: "湖Co (12-20)", sub: "高橋邸", address: "1431-29", key: "" },
+    { id: "place_lake_terrace_4661", type: "place", name: "LAKE Terrace 4-661", sub: "堂阪邸", address: "1039-74", key: "" }
+  ];
+
+  let state = loadState();
+  let current = new Date();
+  let selectedColor = COLORS[0];
+
+  const calendarScroll = document.getElementById("calendarScroll");
+  const calendarGrid = document.getElementById("calendarGrid");
+  const monthTitle = document.getElementById("monthTitle");
+
+  const eventSheetBackdrop = document.getElementById("eventSheetBackdrop");
+  const itemSheetBackdrop = document.getElementById("itemSheetBackdrop");
+  const activitySheetBackdrop = document.getElementById("activitySheetBackdrop");
+
+  const editingDate = document.getElementById("editingDate");
+  const editingItemId = document.getElementById("editingItemId");
+  const eventUserInput = document.getElementById("eventUserInput");
+  const eventPeopleInput = document.getElementById("eventPeopleInput");
+  const eventStaffInput = document.getElementById("eventStaffInput");
+  const eventNoteInput = document.getElementById("eventNoteInput");
+  const colorPalette = document.getElementById("colorPalette");
+
+  const editingItemSheetId = document.getElementById("editingItemSheetId");
+  const itemNameInput = document.getElementById("itemNameInput");
+  const itemSubInput = document.getElementById("itemSubInput");
+  const itemAddressInput = document.getElementById("itemAddressInput");
+  const itemKeyInput = document.getElementById("itemKeyInput");
+
+  const activityDateInput = document.getElementById("activityDateInput");
+  const activityInfoInput = document.getElementById("activityInfoInput");
+  const activityStartInput = document.getElementById("activityStartInput");
+  const activityEndInput = document.getElementById("activityEndInput");
+
+  document.getElementById("prevMonthBtn").onclick = () => {
+    current.setMonth(current.getMonth() - 1);
+    renderCalendar(true);
+  };
+
+  document.getElementById("nextMonthBtn").onclick = () => {
+    current.setMonth(current.getMonth() + 1);
+    renderCalendar(true);
+  };
+
+  document.getElementById("todayBtn").onclick = () => {
+    current = new Date();
+    renderCalendar(false);
+
+    requestAnimationFrame(() => {
+      scrollToDate(toDateString(new Date()));
+    });
+  };
+
+  document.getElementById("exportBtn").onclick = exportBackup;
+  document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
+  document.getElementById("importFile").onchange = importBackup;
+
+
+
+  document.getElementById("eventCloseBtn").onclick = closeEventSheet;
+  document.getElementById("eventSaveBtn").onclick = saveEventFromSheet;
+  document.getElementById("eventDeleteBtn").onclick = deleteEventFromSheet;
+  eventSheetBackdrop.addEventListener("click", e => {
+    if (e.target === eventSheetBackdrop) closeEventSheet();
+  });
+
+  document.getElementById("itemCloseBtn").onclick = closeItemSheet;
+  document.getElementById("itemSaveBtn").onclick = saveItemFromSheet;
+  document.getElementById("itemDeleteBtn").onclick = deleteItemFromSheet;
+  itemSheetBackdrop.addEventListener("click", e => {
+    if (e.target === itemSheetBackdrop) closeItemSheet();
+  });
+
+  document.getElementById("activityCloseBtn").onclick = closeActivitySheet;
+  document.getElementById("activitySaveBtn").onclick = saveActivityTimeFromSheet;
+  document.getElementById("activityDeleteBtn").onclick = deleteActivityTimeFromSheet;
+  activitySheetBackdrop.addEventListener("click", e => {
+    if (e.target === activitySheetBackdrop) closeActivitySheet();
+  });
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && Array.isArray(saved.items)) {
+        return {
+          items: saved.items,
+          events: saved.events || {},
+          activityTimes: saved.activityTimes || {}
+        };
+      }
+    } catch {}
+
+    return {
+      items: DEFAULT_ITEMS.slice(),
+      events: {},
+      activityTimes: {}
+    };
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function renderCalendar(resetScroll = false) {
+    const days = getMonthDates(current);
+    const rows = state.items.length;
+
+    calendarGrid.style.setProperty("--days", days.length);
+    calendarGrid.style.setProperty("--rows", rows);
+    monthTitle.textContent = `${current.getFullYear()}年${current.getMonth() + 1}月`;
+    calendarGrid.innerHTML = "";
+
+    const corner = document.createElement("div");
+    corner.className = "corner";
+    corner.innerHTML = `
+      <span>項目 / 日付</span>
+      <button class="corner-add" id="cornerAddItemBtn" type="button" title="項目追加" aria-label="項目追加">＋</button>
+    `;
+    calendarGrid.appendChild(corner);
+
+    corner.querySelector("#cornerAddItemBtn").onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openItemSheet();
+    };
+
+    for (const date of days) {
+      const head = document.createElement("div");
+      const dateStr = toDateString(date);
+      const day = date.getDay();
+
+      head.className = "date-head" + (isToday(date) ? " today" : "") + (day === 0 ? " sun" : "") + (day === 6 ? " sat" : "");
+      head.dataset.date = dateStr;
+      head.innerHTML = `
+        <div>
+          <div class="date-num">${date.getDate()}日</div>
+          <div class="date-week">${["日","月","火","水","木","金","土"][day]}</div>
+        </div>
+      `;
+      head.onclick = () => scrollToDate(dateStr);
+      calendarGrid.appendChild(head);
+    }
+
+    state.items.forEach(item => {
+      const left = document.createElement("div");
+      left.className = "left-cell" + (item.type === "activity" ? " activity" : "");
+      left.innerHTML = item.type === "activity"
+        ? `<div class="item-name">活動時間</div><div class="item-sub">その日1日の開始・終了</div>`
+        : `
+          <div class="item-name">${escapeHtml(item.name)}</div>
+          ${(item.sub || item.address) ? `<div class="item-sub">${escapeHtml([item.sub, item.address].filter(Boolean).join(" "))}</div>` : ""}
+          ${item.key ? `<div class="item-key">（${escapeHtml(item.key)}）</div>` : ""}
+        `;
+      setupLongPress(left, () => {
+        if (item.type === "activity") return;
+        openItemSheet(item);
+      });
+      calendarGrid.appendChild(left);
+
+      for (const date of days) {
+        const dateStr = toDateString(date);
+        const cell = document.createElement("div");
+        cell.className = "cal-cell";
+        cell.dataset.date = dateStr;
+        cell.dataset.itemId = item.id;
+
+        if (item.type === "activity") {
+          const time = state.activityTimes[dateStr];
+          cell.innerHTML = renderActivityCell(time);
+          if (time?.start || time?.end) cell.classList.add("has-event");
+
+        } else {
+          const ev = getEvent(dateStr, item.id);
+          cell.innerHTML = renderEventCell(ev);
+          if (ev) cell.classList.add("has-event");
+
+        }
+
+        calendarGrid.appendChild(cell);
+      }
+    });
+
+    if (resetScroll) {
+      setTimeout(() => scrollToDate(toDateString(new Date(current.getFullYear(), current.getMonth(), 1))), 0);
+    }
+  }
+
+  function getMonthDates(baseDate) {
+    const start = new Date(baseDate.getFullYear(), baseDate.getMonth(), 1);
+    const end = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0);
+    const result = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      result.push(new Date(d));
+    }
+    return result;
+  }
+
+  function renderActivityCell(time) {
+    if (!time || (!time.start && !time.end)) {
+      return `<div class="activity-card">＋</div>`;
+    }
+
+    return `<div class="activity-card has-time">
+      <div>${escapeHtml(time.start || "--:--")}</div>
+      <div class="activity-tilde">～</div>
+      <div>${escapeHtml(time.end || "--:--")}</div>
+    </div>`;
+  }
+
+  function renderEventCell(ev) {
+    if (!ev) return "";
+    const color = ev.color || COLORS[0];
+
+    return `
+      <div class="mini-card" style="--card-color:${escapeAttr(color)}">
+        ${ev.people ? `<div class="mini-content">${escapeHtml(ev.people)}名</div>` : `<div class="mini-content mini-placeholder">予定</div>`}
+        ${ev.user ? `<div class="mini-line">${escapeHtml(formatUserName(ev.user))}</div>` : ""}
+      </div>
+    `;
+  }
+
+  function eventKey(dateStr, itemId) {
+    return `${dateStr}|${itemId}`;
+  }
+
+  function getEvent(dateStr, itemId) {
+    return state.events[eventKey(dateStr, itemId)] || null;
+  }
+
+  function openEventSheet(dateStr, itemId) {
+    const item = state.items.find(x => x.id === itemId);
+    const ev = getEvent(dateStr, itemId);
+
+    editingDate.value = dateStr;
+    editingItemId.value = itemId;
+    selectedColor = ev?.color || COLORS[0];
+    renderColorPalette();
+
+    eventUserInput.value = removeSama(ev?.user || "");
+    renderPeopleOptions(ev?.people || "");
+    eventStaffInput.value = ev?.staff || "";
+    eventNoteInput.value = ev?.note || "";
+
+    document.getElementById("eventDeleteBtn").style.visibility = ev ? "visible" : "hidden";
+    eventSheetBackdrop.classList.add("show");
+  }
+
+  function closeEventSheet() {
+    eventSheetBackdrop.classList.remove("show");
+  }
+
+  function saveEventFromSheet() {
+    const dateStr = editingDate.value;
+    const itemId = editingItemId.value;
+    if (!dateStr || !itemId) return;
+
+    const old = getEvent(dateStr, itemId) || {};
+
+    const ev = {
+      date: dateStr,
+      itemId,
+      startTime: "",
+      endTime: "",
+      content: old.content || "",
+      company: old.company || "",
+      user: formatUserName(eventUserInput.value.trim()),
+      people: eventPeopleInput.value,
+      staff: eventStaffInput.value.trim(),
+      note: eventNoteInput.value.trim(),
+      color: selectedColor
+    };
+
+    state.events[eventKey(dateStr, itemId)] = ev;
+    saveState();
+    closeEventSheet();
+    renderCalendar(false);
+  }
+
+  function deleteEventFromSheet() {
+    const dateStr = editingDate.value;
+    const itemId = editingItemId.value;
+    if (!confirm("この予定を削除しますか？")) return;
+
+    delete state.events[eventKey(dateStr, itemId)];
+    saveState();
+    closeEventSheet();
+    renderCalendar(false);
+  }
+
+  function editActivityTime(dateStr) {
+    const currentTime = state.activityTimes[dateStr] || {};
+    activityDateInput.value = dateStr;
+    activityInfoInput.value = dateStr.replaceAll("-", "/");
+    activityStartInput.value = currentTime.start || "";
+    activityEndInput.value = currentTime.end || "";
+    document.getElementById("activityDeleteBtn").style.visibility = currentTime.start || currentTime.end ? "visible" : "hidden";
+    activitySheetBackdrop.classList.add("show");
+  }
+
+  function closeActivitySheet() {
+    activitySheetBackdrop.classList.remove("show");
+  }
+
+  function saveActivityTimeFromSheet() {
+    const dateStr = activityDateInput.value;
+    if (!dateStr) return;
+
+    const start = activityStartInput.value;
+    const end = activityEndInput.value;
+
+    if (!start && !end) {
+      delete state.activityTimes[dateStr];
+    } else {
+      state.activityTimes[dateStr] = { start, end };
+    }
+
+    saveState();
+    closeActivitySheet();
+    renderCalendar(false);
+  }
+
+  function deleteActivityTimeFromSheet() {
+    const dateStr = activityDateInput.value;
+    if (!dateStr) return;
+    delete state.activityTimes[dateStr];
+    saveState();
+    closeActivitySheet();
+    renderCalendar(false);
+  }
+
+  function openItemSheet(item = null) {
+    document.getElementById("itemSheetTitle").textContent = item ? "項目を編集" : "項目を追加";
+    editingItemSheetId.value = item?.id || "";
+    itemNameInput.value = item?.name || "";
+    itemSubInput.value = item?.sub || "";
+    itemAddressInput.value = item?.address || "";
+    itemKeyInput.value = item?.key || "";
+    document.getElementById("itemDeleteBtn").style.visibility = item ? "visible" : "hidden";
+    itemSheetBackdrop.classList.add("show");
+  }
+
+  function closeItemSheet() {
+    itemSheetBackdrop.classList.remove("show");
+  }
+
+  function saveItemFromSheet() {
+    const id = editingItemSheetId.value;
+    const name = itemNameInput.value.trim();
+
+    if (id && !name) {
+      deleteItemById(id);
+      closeItemSheet();
+      return;
+    }
+
+    if (!name) {
+      alert("場所・物件を入力してください。");
+      return;
+    }
+
+    const item = {
+      id: id || makeId("place"),
+      type: "place",
+      name,
+      sub: itemSubInput.value.trim(),
+      address: itemAddressInput.value.trim(),
+      key: itemKeyInput.value.trim()
+    };
+
+    const idx = state.items.findIndex(x => x.id === item.id);
+    if (idx >= 0) state.items[idx] = item;
+    else state.items.push(item);
+
+    saveState();
+    closeItemSheet();
+    renderCalendar(false);
+  }
+
+  function deleteItemFromSheet() {
+    const id = editingItemSheetId.value;
+    if (!id) return;
+
+    const item = state.items.find(x => x.id === id);
+    if (!item || item.type === "activity") return;
+
+    if (!confirm(`「${item.name}」を削除しますか？\nこの項目の予定も削除されます。`)) return;
+    deleteItemById(id);
+    closeItemSheet();
+  }
+
+  function deleteItemById(id) {
+    state.items = state.items.filter(x => x.id !== id);
+    Object.keys(state.events).forEach(key => {
+      if (key.endsWith("|" + id)) delete state.events[key];
+    });
+    saveState();
+    renderCalendar(false);
+  }
+
+  function renderColorPalette() {
+    colorPalette.innerHTML = "";
+    COLORS.forEach(color => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "color-dot" + (selectedColor === color ? " selected" : "");
+      btn.style.setProperty("--dot", color);
+      btn.onclick = () => {
+        selectedColor = color;
+        renderColorPalette();
+      };
+      colorPalette.appendChild(btn);
+    });
+  }
+
+  function renderPeopleOptions(value = "") {
+    let html = `<option value="">未入力</option>`;
+    for (let i = 1; i <= 20; i++) html += `<option value="${i}">${i}名</option>`;
+    eventPeopleInput.innerHTML = html;
+    eventPeopleInput.value = value || "";
+  }
+
+  function setupLongPress(el, callback) {
+    let timer = null;
+    el.addEventListener("pointerdown", () => {
+      el.classList.add("long-pressing");
+      timer = setTimeout(() => {
+        el.classList.remove("long-pressing");
+        callback();
+      }, 650);
+    });
+
+    ["pointermove", "pointerup", "pointercancel", "pointerleave"].forEach(type => {
+      el.addEventListener(type, () => {
+        clearTimeout(timer);
+        el.classList.remove("long-pressing");
+      });
+    });
+  }
+
+
+  function setupCellTapHandler() {
+    let downCell = null;
+    let startX = 0;
+    let startY = 0;
+    let startScrollLeft = 0;
+    let startScrollTop = 0;
+    let lastOpenAt = 0;
+
+    function openCell(cell) {
+      if (!cell) return;
+
+      // 二重発火防止
+      const now = Date.now();
+      if (now - lastOpenAt < 250) return;
+      lastOpenAt = now;
+
+      const dateStr = cell.dataset.date;
+      const itemId = cell.dataset.itemId;
+      if (!dateStr || !itemId) return;
+
+      const item = state.items.find(x => x.id === itemId);
+      if (item?.type === "activity") {
+        editActivityTime(dateStr);
+      } else {
+        openEventSheet(dateStr, itemId);
+      }
+    }
+
+    function rememberDown(e) {
+      const cell = e.target.closest(".cal-cell");
+      if (!cell) {
+        downCell = null;
+        return;
+      }
+
+      downCell = cell;
+      startX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
+      startY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
+      startScrollLeft = calendarScroll.scrollLeft;
+      startScrollTop = calendarScroll.scrollTop;
+    }
+
+    function maybeOpenFromUp(e) {
+      if (!downCell) return;
+
+      const x = e.clientX ?? (e.changedTouches && e.changedTouches[0]?.clientX) ?? startX;
+      const y = e.clientY ?? (e.changedTouches && e.changedTouches[0]?.clientY) ?? startY;
+
+      const dx = Math.abs(x - startX);
+      const dy = Math.abs(y - startY);
+      const scrollDx = Math.abs(calendarScroll.scrollLeft - startScrollLeft);
+      const scrollDy = Math.abs(calendarScroll.scrollTop - startScrollTop);
+
+      const cell = downCell;
+      downCell = null;
+
+      // 横スクロール・縦スクロールした場合は開かない。軽い指ブレだけなら開く。
+      if (dx > 12 || dy > 12 || scrollDx > 12 || scrollDy > 12) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      openCell(cell);
+    }
+
+    // Pointer Events 対応ブラウザ用
+    calendarGrid.addEventListener("pointerdown", rememberDown, true);
+    calendarGrid.addEventListener("pointerup", maybeOpenFromUp, true);
+    calendarGrid.addEventListener("pointercancel", () => {
+      downCell = null;
+    }, true);
+
+    // iOS Safari などで pointer/click が不安定な場合の保険
+    calendarGrid.addEventListener("touchstart", rememberDown, { capture: true, passive: true });
+    calendarGrid.addEventListener("touchend", maybeOpenFromUp, { capture: true, passive: false });
+    calendarGrid.addEventListener("touchcancel", () => {
+      downCell = null;
+    }, true);
+
+    // 最後の保険：通常clickでも開く
+    calendarGrid.addEventListener("click", (e) => {
+      if (calendarScroll.dataset.suppressClick === "1") return;
+
+      const cell = e.target.closest(".cal-cell");
+      if (!cell) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      openCell(cell);
+    }, true);
+  }
+
+  function setupCalendarDragScroll() {
+    let isDown = false;
+    let startX = 0;
+    let startY = 0;
+    let startScrollLeft = 0;
+    let startScrollTop = 0;
+    let moved = false;
+    let activePointerId = null;
+
+    let lastX = 0;
+    let lastT = 0;
+    let velocity = 0;
+    let rafId = null;
+
+    function cancelMomentum() {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    }
+
+    function startMomentum(v) {
+      cancelMomentum();
+      velocity = v;
+
+      function step() {
+        if (Math.abs(velocity) < 0.04) {
+          velocity = 0;
+          return;
+        }
+
+        calendarScroll.scrollLeft += velocity * 16;
+        velocity *= 0.88;
+        rafId = requestAnimationFrame(step);
+      }
+
+      rafId = requestAnimationFrame(step);
+    }
+
+    // PCで文字やセルを掴むのを防ぐ
+    calendarScroll.addEventListener("dragstart", (e) => e.preventDefault());
+    calendarScroll.addEventListener("selectstart", (e) => {
+      if (isDown) e.preventDefault();
+    });
+
+    calendarScroll.addEventListener("pointerdown", (e) => {
+      // スマホ/タブレットのタッチは標準スクロールに任せる。
+      // これでセルタップが「掴むモード」になりにくくなる。
+      if (e.pointerType !== "mouse") return;
+
+      if (e.target.closest("button, input, select, textarea")) return;
+      if (e.button !== 0) return;
+
+      cancelMomentum();
+      isDown = true;
+      moved = false;
+      activePointerId = e.pointerId;
+      startX = lastX = e.clientX;
+      startY = e.clientY;
+      lastT = e.timeStamp;
+      startScrollLeft = calendarScroll.scrollLeft;
+      startScrollTop = calendarScroll.scrollTop;
+      velocity = 0;
+      calendarScroll.dataset.downDate = e.target.closest(".cal-cell")?.dataset.date || "";
+      calendarScroll.dataset.downItemId = e.target.closest(".cal-cell")?.dataset.itemId || "";
+
+      calendarScroll.classList.add("dragging");
+
+      try { calendarScroll.setPointerCapture(e.pointerId); } catch {}
+    });
+
+    calendarScroll.addEventListener("pointermove", (e) => {
+      if (!isDown || e.pointerId !== activePointerId) return;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+
+      if (moved) {
+        const dt = e.timeStamp - lastT || 1;
+        velocity = -(e.clientX - lastX) / dt;
+        lastX = e.clientX;
+        lastT = e.timeStamp;
+
+        calendarScroll.scrollLeft = startScrollLeft - dx;
+        calendarScroll.scrollTop = startScrollTop - dy;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    calendarScroll.addEventListener("pointerup", (e) => {
+      if (!isDown || e.pointerId !== activePointerId) return;
+
+      const wasMoved = moved;
+      isDown = false;
+      moved = false;
+      activePointerId = null;
+      calendarScroll.classList.remove("dragging");
+
+      try { calendarScroll.releasePointerCapture(e.pointerId); } catch {}
+
+      if (wasMoved) {
+        calendarScroll.dataset.suppressClick = "1";
+        setTimeout(() => {
+          delete calendarScroll.dataset.suppressClick;
+        }, 250);
+        startMomentum(velocity);
+      } else {
+        const dateStr = calendarScroll.dataset.downDate;
+        const itemId = calendarScroll.dataset.downItemId;
+
+        delete calendarScroll.dataset.downDate;
+        delete calendarScroll.dataset.downItemId;
+
+        if (dateStr && itemId) {
+          const item = state.items.find(x => x.id === itemId);
+          if (item?.type === "activity") {
+            editActivityTime(dateStr);
+          } else {
+            openEventSheet(dateStr, itemId);
+          }
+        }
+      }
+    });
+
+    calendarScroll.addEventListener("click", (e) => {
+      if (calendarScroll.dataset.suppressClick === "1") {
+        e.preventDefault();
+        e.stopPropagation();
+        delete calendarScroll.dataset.suppressClick;
+      }
+    }, true);
+
+    calendarScroll.addEventListener("pointercancel", () => {
+      isDown = false;
+      moved = false;
+      activePointerId = null;
+      calendarScroll.classList.remove("dragging");
+      delete calendarScroll.dataset.downDate;
+      delete calendarScroll.dataset.downItemId;
+      cancelMomentum();
+    });
+
+    calendarScroll.addEventListener("wheel", (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.shiftKey) {
+        calendarScroll.scrollLeft += e.deltaY;
+        e.preventDefault();
+      }
+    }, { passive: false });
+  }
+
+  function scrollToDate(dateStr) {
+    const target = calendarGrid.querySelector(`.date-head[data-date="${dateStr}"]`);
+    if (!target) return;
+    calendarScroll.scrollLeft = Math.max(0, target.offsetLeft - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--leftw")));
+  }
+
+  function exportBackup() {
+    const data = {
+      app: "Cleaning Calendar Grid",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      state
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `cleaning_calendar_backup_${toDateString(new Date())}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function importBackup(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const imported = data.state || data;
+
+      if (!imported || !Array.isArray(imported.items)) throw new Error("invalid");
+      if (!confirm("現在のデータをバックアップ内容で置き換えますか？")) return;
+
+      state = {
+        items: imported.items,
+        events: imported.events || {},
+        activityTimes: imported.activityTimes || {}
+      };
+
+      saveState();
+      renderCalendar(true);
+      alert("復元しました。");
+    } catch {
+      alert("復元に失敗しました。JSONファイルを確認してください。");
+    } finally {
+      e.target.value = "";
+    }
+  }
+
+  function toDateString(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function isToday(date) {
+    return toDateString(date) === toDateString(new Date());
+  }
+
+  function makeId(prefix = "id") {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  }
+
+  function formatUserName(name) {
+    const n = String(name || "").trim();
+    if (!n) return "";
+    return n.endsWith("様") ? n : n + "様";
+  }
+
+  function removeSama(name) {
+    return String(name || "").replace(/様$/, "");
+  }
+
+  function unique(arr) {
+    return [...new Set(arr.map(v => String(v).trim()).filter(Boolean))];
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? "").replace(/[&<>"']/g, s => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[s]));
+  }
+
+  function escapeAttr(str) {
+    return escapeHtml(str).replace(/`/g, "&#096;");
+  }
+
+  setupCellTapHandler();
+  setupCalendarDragScroll();
+  renderCalendar(true);
+  setTimeout(() => scrollToDate(toDateString(new Date())), 80);
+</script>
+</body>
+</html>
