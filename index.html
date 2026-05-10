@@ -26,8 +26,8 @@
       --accent: #6aa6ff;
       --cellw: 94px;
       --leftw: 176px;
-      --headh: 52px;
-      --rowh: 78px;
+      --headh: 48px;
+      --rowh: 70px;
     }
 
     * { box-sizing: border-box; }
@@ -207,18 +207,25 @@
       left: 0;
       z-index: 15;
       touch-action: pan-y;
+      cursor: pointer;
       background: rgba(17, 20, 29, 0.98);
-      padding: 6px 8px 6px 10px;
+      padding: 5px 8px 5px 10px;
       overflow: hidden;
       display: grid;
       align-content: center;
       gap: 3px;
       user-select: none;
       -webkit-user-select: none;
+      transition: background 0.15s;
+    }
+
+    .left-cell:not(.activity):hover {
+      background: rgba(32, 36, 52, 0.98);
     }
 
     .left-cell.activity {
       background: rgba(32, 36, 47, 0.98);
+      cursor: default;
     }
 
     .left-cell.long-pressing {
@@ -251,12 +258,22 @@
       font-size: 10px;
       color: var(--muted);
       line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .item-key-value {
+      color: #facc15;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      font-variant-numeric: tabular-nums;
     }
 
     .cal-cell {
       min-width: var(--cellw);
       height: var(--rowh);
-      padding: 4px;
+      padding: 3px;
       touch-action: pan-x;
       background: rgba(255,255,255,0.018);
       position: relative;
@@ -279,7 +296,7 @@
       border-radius: 9px;
       border: 1px solid rgba(255,255,255,0.08);
       background: var(--card-color, rgba(106,166,255,.28));
-      padding: 4px;
+      padding: 3px;
       overflow: hidden;
       color: #f8fafc;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
@@ -292,7 +309,7 @@
     }
 
     .mini-content {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 950;
       line-height: 1;
       white-space: nowrap;
@@ -346,15 +363,37 @@
       line-height: 1;
     }
 
+    .activity-more {
+      font-size: 10px;
+      color: #fde68a;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .activity-total-time {
+      color: #facc15;
+      font-size: 17px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Sheets ── */
     .sheet-backdrop {
       position: fixed;
       inset: 0;
       z-index: 50;
       background: rgba(0,0,0,.56);
       display: none;
+      animation: backdropIn 0.18s ease;
     }
 
     .sheet-backdrop.show { display: block; }
+
+    @keyframes backdropIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
 
     .sheet {
       position: absolute;
@@ -369,6 +408,12 @@
       background: rgba(23, 26, 34, .96);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      animation: sheetUp 0.22s cubic-bezier(.32,1,.32,1);
+    }
+
+    @keyframes sheetUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
     }
 
     .sheet-head {
@@ -464,7 +509,13 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 12px;
+    }
+
+    .actions button {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 10px;
     }
 
     .delete {
@@ -484,11 +535,244 @@
       margin-top: 8px;
     }
 
+    .select-add-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .add-small {
+      height: 46px;
+      padding: 0 12px;
+      white-space: nowrap;
+    }
+
+    .activity-list {
+      display: grid;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .activity-list-card {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 10px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .activity-list-time {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .activity-list-meta {
+      font-size: 13px;
+      color: #d1d5db;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .activity-editor {
+      display: none;
+      border: 1px solid rgba(106,166,255,.25);
+      border-radius: 16px;
+      padding: 12px;
+      margin: 12px 0;
+      background: rgba(106,166,255,.06);
+    }
+
+    .activity-editor.show { display: block; }
+
+    .activity-list-duration {
+      color: #facc15;
+      font-size: 14px;
+      font-weight: 950;
+      line-height: 1.2;
+    }
+
+    .activity-staff-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 36px;
+      padding: 8px;
+      margin-top: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .activity-staff-tag {
+      border: 1px solid rgba(106,166,255,.35);
+      background: rgba(106,166,255,.16);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .activity-staff-tag.removing {
+      outline: 2px solid rgba(255,91,91,.75);
+      background: rgba(255,91,91,.18);
+    }
+
+    .activity-staff-empty {
+      color: var(--muted);
+      font-size: 12px;
+      align-self: center;
+    }
+
+    .activity-add-row {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0 4px;
+    }
+
+    .activity-add-button {
+      width: 46px;
+      height: 46px;
+      min-width: 46px;
+      padding: 0;
+      border-radius: 999px;
+      background: rgba(106,166,255,.16);
+      border: 1px solid rgba(106,166,255,.35);
+      color: var(--text);
+      font-size: 26px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .activity-edit-actions {
+      margin-top: 10px;
+      grid-template-columns: repeat(3, max-content);
+      justify-content: end;
+    }
+
+    .activity-edit-actions button {
+      min-width: 64px;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    /* ── Item Detail Card ── */
+    .item-detail-card {
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .detail-header {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .detail-name {
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+      margin-bottom: 4px;
+    }
+
+    .detail-sub {
+      font-size: 14px;
+      color: #a0aec0;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-rows {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-row-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .detail-row-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+
+    .detail-row-value.empty {
+      color: rgba(156,163,175,0.4);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .detail-row-value.key-value {
+      font-size: 18px;
+      font-weight: 950;
+      color: #facc15;
+      letter-spacing: 0.05em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .detail-edit-row {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .detail-edit-icon-button {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(106,166,255,.35);
+      background: rgba(106,166,255,.16);
+      color: var(--text);
+      font-size: 22px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .detail-edit-icon-button:active {
+      transform: scale(0.94);
+      background: rgba(106,166,255,.24);
+    }
+
     @media (min-width: 820px) {
       :root {
         --cellw: 104px;
         --leftw: 220px;
-        --rowh: 82px;
+        --rowh: 74px;
       }
 
       body {
@@ -518,10 +802,10 @@
 
   <main class="calendar-scroll" id="calendarScroll">
     <div class="calendar-grid" id="calendarGrid"></div>
-
   </main>
 </div>
 
+<!-- Event Sheet -->
 <div class="sheet-backdrop" id="eventSheetBackdrop">
   <div class="sheet">
     <div class="sheet-head">
@@ -559,6 +843,7 @@
   </div>
 </div>
 
+<!-- Item Edit Sheet -->
 <div class="sheet-backdrop" id="itemSheetBackdrop">
   <div class="sheet">
     <div class="sheet-head">
@@ -589,6 +874,7 @@
   </div>
 </div>
 
+<!-- Activity Sheet -->
 <div class="sheet-backdrop" id="activitySheetBackdrop">
   <div class="sheet">
     <div class="sheet-head">
@@ -597,24 +883,65 @@
     </div>
 
     <input type="hidden" id="activityDateInput">
+    <input type="hidden" id="activityEditingId">
 
     <label>日付</label>
     <input id="activityInfoInput" readonly>
 
-    <div class="time-row">
-      <div>
-        <label>開始時間</label>
-        <input type="time" id="activityStartInput">
+    <div class="activity-list" id="activityList"></div>
+
+    <div class="activity-editor" id="activityEditor">
+      <div class="time-row">
+        <div>
+          <label>開始時間</label>
+          <input type="time" id="activityStartInput">
+        </div>
+        <div>
+          <label>終了時間</label>
+          <input type="time" id="activityEndInput">
+        </div>
       </div>
-      <div>
-        <label>終了時間</label>
-        <input type="time" id="activityEndInput">
+
+      <label>内容</label>
+      <div class="select-add-row">
+        <select id="activityContentInput"></select>
+        <button class="add-small" id="activityContentAddBtn" type="button">追加</button>
+      </div>
+
+      <label>担当</label>
+      <div class="select-add-row">
+        <select id="activityStaffInput"></select>
+        <button class="add-small" id="activityStaffAddBtn" type="button">追加</button>
+      </div>
+      <div class="activity-staff-tags" id="activityStaffTags"></div>
+
+      <div class="actions activity-edit-actions">
+        <button id="activityBackBtn" type="button">戻る</button>
+        <button class="save" id="activityEntrySaveBtn" type="button">保存</button>
+        <button class="delete" id="activityEntryDeleteBtn" type="button">削除</button>
       </div>
     </div>
 
-    <div class="actions">
-      <button class="delete" id="activityDeleteBtn">削除</button>
-      <button class="save" id="activitySaveBtn">保存</button>
+    <div class="activity-add-row">
+      <button class="activity-add-button" id="activityAddBtn" type="button" aria-label="活動時間を追加" title="活動時間を追加">＋</button>
+    </div>
+
+
+  </div>
+</div>
+
+<!-- Item Detail Sheet -->
+<div class="sheet-backdrop" id="itemDetailBackdrop">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>物件詳細</h2>
+      <button class="sheet-close" id="itemDetailCloseBtn" type="button">×</button>
+    </div>
+
+    <div id="itemDetailCard"></div>
+
+    <div class="detail-edit-row">
+      <button class="detail-edit-icon-button" id="itemDetailEditBtn" type="button" aria-label="編集" title="編集">✏️</button>
     </div>
   </div>
 </div>
@@ -632,12 +959,8 @@
     "#4dd4ac55"
   ];
 
-  const CONTENTS = [
-    "日帰り",
-    "連泊（チェックイン）",
-    "連泊（清掃）",
-    "連泊（チェックアウト）"
-  ];
+  const DEFAULT_ACTIVITY_CONTENTS = ["清掃", "準備", "移動", "確認", "その他"];
+  const DEFAULT_ACTIVITY_STAFFS = [];
 
   const DEFAULT_ITEMS = [
     { id: "activity", type: "activity", name: "活動時間", sub: "", address: "", key: "" },
@@ -653,80 +976,125 @@
   let state = loadState();
   let current = new Date();
   let selectedColor = COLORS[0];
+  let currentDetailItemId = "";
+  let activitySelectedStaffs = [];
 
   const calendarScroll = document.getElementById("calendarScroll");
-  const calendarGrid = document.getElementById("calendarGrid");
-  const monthTitle = document.getElementById("monthTitle");
+  const calendarGrid   = document.getElementById("calendarGrid");
+  const monthTitle     = document.getElementById("monthTitle");
 
-  const eventSheetBackdrop = document.getElementById("eventSheetBackdrop");
-  const itemSheetBackdrop = document.getElementById("itemSheetBackdrop");
+  const eventSheetBackdrop    = document.getElementById("eventSheetBackdrop");
+  const itemSheetBackdrop     = document.getElementById("itemSheetBackdrop");
   const activitySheetBackdrop = document.getElementById("activitySheetBackdrop");
+  const itemDetailBackdrop    = document.getElementById("itemDetailBackdrop");
+  const itemDetailCard        = document.getElementById("itemDetailCard");
 
-  const editingDate = document.getElementById("editingDate");
-  const editingItemId = document.getElementById("editingItemId");
-  const eventUserInput = document.getElementById("eventUserInput");
+  const editingDate      = document.getElementById("editingDate");
+  const editingItemId    = document.getElementById("editingItemId");
+  const eventUserInput   = document.getElementById("eventUserInput");
   const eventPeopleInput = document.getElementById("eventPeopleInput");
-  const eventStaffInput = document.getElementById("eventStaffInput");
-  const eventNoteInput = document.getElementById("eventNoteInput");
-  const colorPalette = document.getElementById("colorPalette");
+  const eventStaffInput  = document.getElementById("eventStaffInput");
+  const eventNoteInput   = document.getElementById("eventNoteInput");
+  const colorPalette     = document.getElementById("colorPalette");
 
   const editingItemSheetId = document.getElementById("editingItemSheetId");
-  const itemNameInput = document.getElementById("itemNameInput");
-  const itemSubInput = document.getElementById("itemSubInput");
-  const itemAddressInput = document.getElementById("itemAddressInput");
-  const itemKeyInput = document.getElementById("itemKeyInput");
+  const itemNameInput      = document.getElementById("itemNameInput");
+  const itemSubInput       = document.getElementById("itemSubInput");
+  const itemAddressInput   = document.getElementById("itemAddressInput");
+  const itemKeyInput       = document.getElementById("itemKeyInput");
 
-  const activityDateInput = document.getElementById("activityDateInput");
-  const activityInfoInput = document.getElementById("activityInfoInput");
-  const activityStartInput = document.getElementById("activityStartInput");
-  const activityEndInput = document.getElementById("activityEndInput");
+  const activityDateInput    = document.getElementById("activityDateInput");
+  const activityInfoInput    = document.getElementById("activityInfoInput");
+  const activityEditingId    = document.getElementById("activityEditingId");
+  const activityList         = document.getElementById("activityList");
+  const activityEditor       = document.getElementById("activityEditor");
+  const activityStartInput   = document.getElementById("activityStartInput");
+  const activityEndInput     = document.getElementById("activityEndInput");
+  const activityContentInput = document.getElementById("activityContentInput");
+  const activityStaffInput   = document.getElementById("activityStaffInput");
+  const activityStaffTags    = document.getElementById("activityStaffTags");
+  const activityDuration     = null;
 
+  activityStartInput.addEventListener("focus", () => {
+    if (!activityStartInput.value) activityStartInput.value = "09:00";
+  });
+
+  activityEndInput.addEventListener("focus", () => {
+    if (!activityEndInput.value) activityEndInput.value = "09:00";
+  });
+
+  activityStartInput.addEventListener("input", updateActivityDuration);
+  activityEndInput.addEventListener("input", updateActivityDuration);
+
+  activityStaffInput.addEventListener("change", () => {
+    if (activityStaffInput.value) {
+      addActivityStaffTag(activityStaffInput.value);
+      activityStaffInput.value = "";
+    }
+  });
+
+  // ── Header buttons ──────────────────────────────────────────
   document.getElementById("prevMonthBtn").onclick = () => {
     current.setMonth(current.getMonth() - 1);
     renderCalendar(true);
   };
-
   document.getElementById("nextMonthBtn").onclick = () => {
     current.setMonth(current.getMonth() + 1);
     renderCalendar(true);
   };
-
   document.getElementById("todayBtn").onclick = () => {
     current = new Date();
     renderCalendar(false);
-
-    requestAnimationFrame(() => {
-      scrollToDate(toDateString(new Date()));
-    });
+    requestAnimationFrame(() => scrollToDate(toDateString(new Date())));
   };
-
   document.getElementById("exportBtn").onclick = exportBackup;
   document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
   document.getElementById("importFile").onchange = importBackup;
 
-
-
+  // ── Event Sheet ──────────────────────────────────────────────
   document.getElementById("eventCloseBtn").onclick = closeEventSheet;
-  document.getElementById("eventSaveBtn").onclick = saveEventFromSheet;
+  document.getElementById("eventSaveBtn").onclick  = saveEventFromSheet;
   document.getElementById("eventDeleteBtn").onclick = deleteEventFromSheet;
   eventSheetBackdrop.addEventListener("click", e => {
     if (e.target === eventSheetBackdrop) closeEventSheet();
   });
 
-  document.getElementById("itemCloseBtn").onclick = closeItemSheet;
-  document.getElementById("itemSaveBtn").onclick = saveItemFromSheet;
+  // ── Item Sheet ───────────────────────────────────────────────
+  document.getElementById("itemCloseBtn").onclick  = closeItemSheet;
+  document.getElementById("itemSaveBtn").onclick   = saveItemFromSheet;
   document.getElementById("itemDeleteBtn").onclick = deleteItemFromSheet;
   itemSheetBackdrop.addEventListener("click", e => {
     if (e.target === itemSheetBackdrop) closeItemSheet();
   });
 
+  // ── Item Detail Sheet ────────────────────────────────────────
+  document.getElementById("itemDetailCloseBtn").onclick = closeItemDetailSheet;
+  document.getElementById("itemDetailEditBtn").onclick = () => {
+    const item = state.items.find(x => x.id === currentDetailItemId);
+    if (!item || item.type === "activity") return;
+
+    closeItemDetailSheet();
+    openItemSheet(item);
+  };
+  itemDetailBackdrop.addEventListener("click", e => {
+    if (e.target === itemDetailBackdrop) closeItemDetailSheet();
+  });
+
+  // ── Activity Sheet buttons ───────────────────────────────────
   document.getElementById("activityCloseBtn").onclick = closeActivitySheet;
-  document.getElementById("activitySaveBtn").onclick = saveActivityTimeFromSheet;
-  document.getElementById("activityDeleteBtn").onclick = deleteActivityTimeFromSheet;
+  document.getElementById("activityAddBtn").onclick = () => openActivityEntryEditor();
+  document.getElementById("activityBackBtn").onclick = closeActivityEntryEditor;
+  document.getElementById("activityEntrySaveBtn").onclick = saveActivityTimeFromSheet;
+  document.getElementById("activityEntryDeleteBtn").onclick = deleteActivityEntryFromEditor;
+
+  setupActivityOptionButton("activityContentAddBtn", "activityContents", "内容を追加", activityContentInput, renderActivityContentOptions);
+  setupActivityOptionButton("activityStaffAddBtn", "activityStaffs", "担当を追加", activityStaffInput, renderActivityStaffOptions);
+
   activitySheetBackdrop.addEventListener("click", e => {
     if (e.target === activitySheetBackdrop) closeActivitySheet();
   });
 
+  // ── State ────────────────────────────────────────────────────
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -734,7 +1102,9 @@
         return {
           items: saved.items,
           events: saved.events || {},
-          activityTimes: saved.activityTimes || {}
+          activityTimes: saved.activityTimes || {},
+          activityContents: Array.isArray(saved.activityContents) ? saved.activityContents : DEFAULT_ACTIVITY_CONTENTS.slice(),
+          activityStaffs: Array.isArray(saved.activityStaffs) ? saved.activityStaffs : DEFAULT_ACTIVITY_STAFFS.slice()
         };
       }
     } catch {}
@@ -742,14 +1112,24 @@
     return {
       items: DEFAULT_ITEMS.slice(),
       events: {},
-      activityTimes: {}
+      activityTimes: {},
+      activityContents: DEFAULT_ACTIVITY_CONTENTS.slice(),
+      activityStaffs: DEFAULT_ACTIVITY_STAFFS.slice()
     };
   }
 
   function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      alert("保存できませんでした。GitHub PagesなどのURLからSafari/Chromeで開いてください。");
+    }
   }
 
+
+
+
+  // ── Render ───────────────────────────────────────────────────
   function renderCalendar(resetScroll = false) {
     const days = getMonthDates(current);
     const rows = state.items.length;
@@ -759,6 +1139,7 @@
     monthTitle.textContent = `${current.getFullYear()}年${current.getMonth() + 1}月`;
     calendarGrid.innerHTML = "";
 
+    // Corner
     const corner = document.createElement("div");
     corner.className = "corner";
     corner.innerHTML = `
@@ -766,18 +1147,17 @@
       <button class="corner-add" id="cornerAddItemBtn" type="button" title="項目追加" aria-label="項目追加">＋</button>
     `;
     calendarGrid.appendChild(corner);
-
     corner.querySelector("#cornerAddItemBtn").onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
       openItemSheet();
     };
 
+    // Date headers
     for (const date of days) {
       const head = document.createElement("div");
       const dateStr = toDateString(date);
       const day = date.getDay();
-
       head.className = "date-head" + (isToday(date) ? " today" : "") + (day === 0 ? " sun" : "") + (day === 6 ? " sat" : "");
       head.dataset.date = dateStr;
       head.innerHTML = `
@@ -790,20 +1170,23 @@
       calendarGrid.appendChild(head);
     }
 
+    // Rows
     state.items.forEach(item => {
       const left = document.createElement("div");
       left.className = "left-cell" + (item.type === "activity" ? " activity" : "");
+      left.dataset.itemId = item.id;
       left.innerHTML = item.type === "activity"
-        ? `<div class="item-name">活動時間</div><div class="item-sub">その日1日の開始・終了</div>`
+        ? `<div class="item-name">活動時間</div>`
         : `
-          <div class="item-name">${escapeHtml(item.name)}</div>
-          ${(item.sub || item.address) ? `<div class="item-sub">${escapeHtml([item.sub, item.address].filter(Boolean).join(" "))}</div>` : ""}
-          ${item.key ? `<div class="item-key">（${escapeHtml(item.key)}）</div>` : ""}
+          <div class="item-name">${escapeHtml(getTopDisplayName(item))}</div>
+          ${item.sub ? `<div class="item-sub">${escapeHtml(item.sub)}</div>` : ""}
+          <div class="item-key">鍵：${item.key ? escapeHtml(item.key) : "─"}</div>
         `;
-      setupLongPress(left, () => {
-        if (item.type === "activity") return;
-        openItemSheet(item);
-      });
+
+      if (item.type !== "activity") {
+        setupItemPress(left, item);
+      }
+
       calendarGrid.appendChild(left);
 
       for (const date of days) {
@@ -816,15 +1199,14 @@
         if (item.type === "activity") {
           const time = state.activityTimes[dateStr];
           cell.innerHTML = renderActivityCell(time);
-          if (time?.start || time?.end) cell.classList.add("has-event");
-
+          if (normalizeActivityEntries(time).length > 0) cell.classList.add("has-event");
         } else {
           const ev = getEvent(dateStr, item.id);
           cell.innerHTML = renderEventCell(ev);
           if (ev) cell.classList.add("has-event");
-
         }
 
+        setupCalendarCellPress(cell, dateStr, item.id);
         calendarGrid.appendChild(cell);
       }
     });
@@ -836,7 +1218,7 @@
 
   function getMonthDates(baseDate) {
     const start = new Date(baseDate.getFullYear(), baseDate.getMonth(), 1);
-    const end = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0);
+    const end   = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0);
     const result = [];
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       result.push(new Date(d));
@@ -844,22 +1226,21 @@
     return result;
   }
 
-  function renderActivityCell(time) {
-    if (!time || (!time.start && !time.end)) {
+  function renderActivityCell(timeData) {
+    const entries = normalizeActivityEntries(timeData);
+    if (entries.length === 0) {
       return `<div class="activity-card">＋</div>`;
     }
 
+    const total = formatTotalActivityDuration(entries);
     return `<div class="activity-card has-time">
-      <div>${escapeHtml(time.start || "--:--")}</div>
-      <div class="activity-tilde">～</div>
-      <div>${escapeHtml(time.end || "--:--")}</div>
+      <div class="activity-total-time">${escapeHtml(total || "0時間")}</div>
     </div>`;
   }
 
   function renderEventCell(ev) {
     if (!ev) return "";
     const color = ev.color || COLORS[0];
-
     return `
       <div class="mini-card" style="--card-color:${escapeAttr(color)}">
         ${ev.people ? `<div class="mini-content">${escapeHtml(ev.people)}名</div>` : `<div class="mini-content mini-placeholder">予定</div>`}
@@ -868,57 +1249,45 @@
     `;
   }
 
-  function eventKey(dateStr, itemId) {
-    return `${dateStr}|${itemId}`;
-  }
 
-  function getEvent(dateStr, itemId) {
-    return state.events[eventKey(dateStr, itemId)] || null;
-  }
 
+
+  // ── Event helpers ────────────────────────────────────────────
+  function eventKey(dateStr, itemId) { return `${dateStr}|${itemId}`; }
+  function getEvent(dateStr, itemId) { return state.events[eventKey(dateStr, itemId)] || null; }
+
+  // ── Event Sheet ──────────────────────────────────────────────
   function openEventSheet(dateStr, itemId) {
-    const item = state.items.find(x => x.id === itemId);
     const ev = getEvent(dateStr, itemId);
-
-    editingDate.value = dateStr;
+    editingDate.value  = dateStr;
     editingItemId.value = itemId;
     selectedColor = ev?.color || COLORS[0];
     renderColorPalette();
-
     eventUserInput.value = removeSama(ev?.user || "");
     renderPeopleOptions(ev?.people || "");
     eventStaffInput.value = ev?.staff || "";
-    eventNoteInput.value = ev?.note || "";
-
+    eventNoteInput.value  = ev?.note  || "";
     document.getElementById("eventDeleteBtn").style.visibility = ev ? "visible" : "hidden";
     eventSheetBackdrop.classList.add("show");
   }
 
-  function closeEventSheet() {
-    eventSheetBackdrop.classList.remove("show");
-  }
+  function closeEventSheet() { eventSheetBackdrop.classList.remove("show"); }
 
   function saveEventFromSheet() {
     const dateStr = editingDate.value;
-    const itemId = editingItemId.value;
+    const itemId  = editingItemId.value;
     if (!dateStr || !itemId) return;
-
     const old = getEvent(dateStr, itemId) || {};
-
     const ev = {
-      date: dateStr,
-      itemId,
-      startTime: "",
-      endTime: "",
-      content: old.content || "",
-      company: old.company || "",
+      date: dateStr, itemId,
+      startTime: "", endTime: "",
+      content: old.content || "", company: old.company || "",
       user: formatUserName(eventUserInput.value.trim()),
       people: eventPeopleInput.value,
       staff: eventStaffInput.value.trim(),
       note: eventNoteInput.value.trim(),
       color: selectedColor
     };
-
     state.events[eventKey(dateStr, itemId)] = ev;
     saveState();
     closeEventSheet();
@@ -927,99 +1296,455 @@
 
   function deleteEventFromSheet() {
     const dateStr = editingDate.value;
-    const itemId = editingItemId.value;
+    const itemId  = editingItemId.value;
     if (!confirm("この予定を削除しますか？")) return;
-
     delete state.events[eventKey(dateStr, itemId)];
     saveState();
     closeEventSheet();
     renderCalendar(false);
   }
 
+
+  // ── Activity Sheet ───────────────────────────────────────────
   function editActivityTime(dateStr) {
-    const currentTime = state.activityTimes[dateStr] || {};
     activityDateInput.value = dateStr;
     activityInfoInput.value = dateStr.replaceAll("-", "/");
-    activityStartInput.value = currentTime.start || "";
-    activityEndInput.value = currentTime.end || "";
-    document.getElementById("activityDeleteBtn").style.visibility = currentTime.start || currentTime.end ? "visible" : "hidden";
+    closeActivityEntryEditor();
+    renderActivityEntryList();
     activitySheetBackdrop.classList.add("show");
   }
 
   function closeActivitySheet() {
     activitySheetBackdrop.classList.remove("show");
+    closeActivityEntryEditor();
+  }
+
+  function getActivityEntriesForDate(dateStr) {
+    return normalizeActivityEntries(state.activityTimes[dateStr]);
+  }
+
+  function setActivityEntriesForDate(dateStr, entries) {
+    if (!entries || entries.length === 0) {
+      delete state.activityTimes[dateStr];
+    } else {
+      state.activityTimes[dateStr] = entries;
+    }
+  }
+
+  function normalizeActivityEntries(value) {
+    if (!value) return [];
+
+    if (Array.isArray(value)) {
+      return value
+        .filter(x => x && (x.start || x.end || x.content || x.staff))
+        .map(x => {
+          const staffs = normalizeStaffList(x.staffs ?? x.staff);
+          return {
+            id: x.id || makeId("act"),
+            start: x.start || "",
+            end: x.end || "",
+            content: x.content || "",
+            staffs,
+            staff: staffs.join("、")
+          };
+        });
+    }
+
+    if (value.start || value.end) {
+      const staffs = normalizeStaffList(value.staffs ?? value.staff);
+      return [{
+        id: value.id || makeId("act"),
+        start: value.start || "",
+        end: value.end || "",
+        content: value.content || "",
+        staffs,
+        staff: staffs.join("、")
+      }];
+    }
+
+    return [];
+  }
+
+  function renderActivityEntryList() {
+    const dateStr = activityDateInput.value;
+    const entries = getActivityEntriesForDate(dateStr);
+
+    if (entries.length === 0) {
+      activityList.innerHTML = `<div class="hint">活動時間はまだありません。＋ボタンで追加できます。</div>`;
+      return;
+    }
+
+    activityList.innerHTML = entries.map(entry => {
+      const duration = formatDuration(entry.start, entry.end);
+      const meta = [entry.content, formatStaffs(entry)].filter(Boolean).join(" / ");
+      return `
+        <button class="activity-list-card" type="button" data-id="${escapeAttr(entry.id)}">
+          <div class="activity-list-time">${escapeHtml(entry.start || "--:--")}～${escapeHtml(entry.end || "--:--")}</div>
+          ${meta ? `<div class="activity-list-meta">${escapeHtml(meta)}</div>` : ""}
+          ${duration ? `<div class="activity-list-duration">${escapeHtml(duration)}</div>` : ""}
+        </button>
+      `;
+    }).join("");
+
+    activityList.querySelectorAll(".activity-list-card").forEach(btn => {
+      btn.onclick = () => {
+        const entry = entries.find(x => x.id === btn.dataset.id);
+        if (entry) openActivityEntryEditor(entry);
+      };
+    });
+  }
+
+  function openActivityEntryEditor(entry = null) {
+    const editing = entry || {
+      id: makeId("act"),
+      start: "09:00",
+      end: "09:00",
+      content: "",
+      staffs: [],
+      staff: ""
+    };
+
+    activityEditingId.value = editing.id;
+    activityStartInput.value = editing.start || "09:00";
+    activityEndInput.value = editing.end || "09:00";
+    renderActivityContentOptions(editing.content || "");
+    activitySelectedStaffs = normalizeStaffList(editing.staffs ?? editing.staff);
+    renderActivityStaffOptions("");
+    renderActivityStaffTags();
+    updateActivityDuration();
+
+    document.getElementById("activityEntryDeleteBtn").style.visibility = entry ? "visible" : "hidden";
+    activityEditor.classList.add("show");
+    document.getElementById("activityAddBtn").style.display = "none";
+  }
+
+  function closeActivityEntryEditor() {
+    activityEditingId.value = "";
+    activitySelectedStaffs = [];
+    renderActivityStaffTags();
+    activityEditor.classList.remove("show");
+    document.getElementById("activityAddBtn").style.display = "";
   }
 
   function saveActivityTimeFromSheet() {
     const dateStr = activityDateInput.value;
     if (!dateStr) return;
 
-    const start = activityStartInput.value;
-    const end = activityEndInput.value;
+    if (activityEditor.classList.contains("show")) {
+      const id = activityEditingId.value || makeId("act");
+      const entries = getActivityEntriesForDate(dateStr);
+      const next = {
+        id,
+        start: activityStartInput.value,
+        end: activityEndInput.value,
+        content: activityContentInput.value,
+        staffs: activitySelectedStaffs.slice(),
+        staff: activitySelectedStaffs.join("、")
+      };
 
-    if (!start && !end) {
-      delete state.activityTimes[dateStr];
-    } else {
-      state.activityTimes[dateStr] = { start, end };
+      const idx = entries.findIndex(x => x.id === id);
+      if (idx >= 0) entries[idx] = next;
+      else entries.push(next);
+
+      setActivityEntriesForDate(dateStr, entries);
+      saveState();
+      closeActivityEntryEditor();
+      renderActivityEntryList();
+      renderCalendar(false);
+      return;
     }
 
     saveState();
     closeActivitySheet();
+    renderCalendar(false);
+  }
+
+  function deleteActivityEntryFromEditor() {
+    const dateStr = activityDateInput.value;
+    const id = activityEditingId.value;
+    if (!dateStr || !id) return;
+
+    if (!confirm("この活動時間を削除しますか？")) return;
+
+    const entries = getActivityEntriesForDate(dateStr).filter(x => x.id !== id);
+    setActivityEntriesForDate(dateStr, entries);
+    saveState();
+    closeActivityEntryEditor();
+    renderActivityEntryList();
     renderCalendar(false);
   }
 
   function deleteActivityTimeFromSheet() {
     const dateStr = activityDateInput.value;
     if (!dateStr) return;
+
+    if (!confirm("この日の活動時間をすべて削除しますか？")) return;
+
     delete state.activityTimes[dateStr];
     saveState();
     closeActivitySheet();
     renderCalendar(false);
   }
 
+  function renderActivityContentOptions(value = "") {
+    renderActivityOptions(activityContentInput, state.activityContents || DEFAULT_ACTIVITY_CONTENTS, value);
+  }
+
+  function renderActivityStaffOptions(value = "") {
+    renderActivityOptions(activityStaffInput, state.activityStaffs || DEFAULT_ACTIVITY_STAFFS, "");
+  }
+
+  function renderActivityOptions(selectEl, values, selected = "") {
+    const uniqueValues = [...new Set([...(values || []), selected].map(v => String(v || "").trim()).filter(Boolean))];
+    selectEl.innerHTML = `<option value="">選択してください</option>` +
+      uniqueValues.map(v => `<option value="${escapeAttr(v)}">${escapeHtml(v)}</option>`).join("");
+    selectEl.value = selected || "";
+  }
+
+  function setupActivityOptionButton(buttonId, stateKey, promptText, selectEl, renderFn) {
+    const btn = document.getElementById(buttonId);
+    let timer = null;
+    let longPressed = false;
+
+    btn.addEventListener("click", () => {
+      if (longPressed) {
+        longPressed = false;
+        return;
+      }
+
+      const name = prompt(promptText, "");
+      if (!name || !name.trim()) return;
+
+      if (!Array.isArray(state[stateKey])) state[stateKey] = [];
+      if (!state[stateKey].includes(name.trim())) state[stateKey].push(name.trim());
+
+      saveState();
+      renderFn(name.trim());
+      selectEl.value = name.trim();
+
+      if (stateKey === "activityStaffs") {
+        addActivityStaffTag(name.trim());
+        selectEl.value = "";
+      }
+    });
+
+    btn.addEventListener("pointerdown", () => {
+      longPressed = false;
+      timer = setTimeout(() => {
+        longPressed = true;
+        editActivityOption(stateKey, selectEl, renderFn);
+      }, 650);
+    });
+
+    btn.addEventListener("pointerup", () => clearTimeout(timer));
+    btn.addEventListener("pointercancel", () => clearTimeout(timer));
+    btn.addEventListener("pointerleave", () => clearTimeout(timer));
+  }
+
+  function editActivityOption(stateKey, selectEl, renderFn) {
+    const oldValue = selectEl.value;
+    if (!oldValue) {
+      alert("編集する項目を選択してください。");
+      return;
+    }
+
+    const newValueRaw = prompt("項目を編集\n※空にしてOKを押すと削除", oldValue);
+    if (newValueRaw === null) return;
+
+    const newValue = newValueRaw.trim();
+
+    if (!Array.isArray(state[stateKey])) state[stateKey] = [];
+
+    if (!newValue) {
+      if (!confirm(`「${oldValue}」を削除しますか？`)) return;
+      state[stateKey] = state[stateKey].filter(v => v !== oldValue);
+
+      Object.keys(state.activityTimes || {}).forEach(dateStr => {
+        const entries = normalizeActivityEntries(state.activityTimes[dateStr]).map(entry => {
+          if (stateKey === "activityContents" && entry.content === oldValue) return { ...entry, content: "" };
+          if (stateKey === "activityStaffs") {
+            const staffs = normalizeStaffList(entry.staffs ?? entry.staff).filter(v => v !== oldValue);
+            return { ...entry, staffs, staff: staffs.join("、") };
+          }
+          return entry;
+        });
+        setActivityEntriesForDate(dateStr, entries);
+      });
+
+      selectEl.value = "";
+      renderFn("");
+      saveState();
+      return;
+    }
+
+    state[stateKey] = [...new Set(state[stateKey].map(v => v === oldValue ? newValue : v))];
+
+    Object.keys(state.activityTimes || {}).forEach(dateStr => {
+      const entries = normalizeActivityEntries(state.activityTimes[dateStr]).map(entry => {
+        if (stateKey === "activityContents" && entry.content === oldValue) return { ...entry, content: newValue };
+        if (stateKey === "activityStaffs") {
+          const staffs = normalizeStaffList(entry.staffs ?? entry.staff).map(v => v === oldValue ? newValue : v);
+          return { ...entry, staffs, staff: staffs.join("、") };
+        }
+        return entry;
+      });
+      setActivityEntriesForDate(dateStr, entries);
+    });
+
+    saveState();
+    renderFn(newValue);
+    selectEl.value = newValue;
+  }
+
+  function normalizeStaffList(value) {
+    if (Array.isArray(value)) {
+      return [...new Set(value.map(v => String(v || "").trim()).filter(Boolean))];
+    }
+
+    return [...new Set(String(value || "")
+      .split(/[、,\/\s]+/)
+      .map(v => v.trim())
+      .filter(Boolean))];
+  }
+
+  function formatStaffs(entry) {
+    return normalizeStaffList(entry.staffs ?? entry.staff).join("、");
+  }
+
+  function addActivityStaffTag(name) {
+    const value = String(name || "").trim();
+    if (!value) return;
+
+    if (!activitySelectedStaffs.includes(value)) {
+      activitySelectedStaffs.push(value);
+    }
+
+    renderActivityStaffTags();
+  }
+
+  function removeActivityStaffTag(name) {
+    activitySelectedStaffs = activitySelectedStaffs.filter(v => v !== name);
+    renderActivityStaffTags();
+  }
+
+  function renderActivityStaffTags() {
+    if (!activityStaffTags) return;
+
+    if (!activitySelectedStaffs.length) {
+      activityStaffTags.innerHTML = `<div class="activity-staff-empty">担当を選択するとタグで追加されます</div>`;
+      return;
+    }
+
+    activityStaffTags.innerHTML = activitySelectedStaffs
+      .map(name => `<span class="activity-staff-tag" data-name="${escapeAttr(name)}">${escapeHtml(name)}</span>`)
+      .join("");
+
+    activityStaffTags.querySelectorAll(".activity-staff-tag").forEach(tag => {
+      let timer = null;
+
+      tag.addEventListener("pointerdown", () => {
+        tag.classList.add("removing");
+        timer = setTimeout(() => {
+          const name = tag.dataset.name;
+          removeActivityStaffTag(name);
+        }, 650);
+      });
+
+      ["pointerup", "pointercancel", "pointerleave"].forEach(type => {
+        tag.addEventListener(type, () => {
+          clearTimeout(timer);
+          tag.classList.remove("removing");
+        });
+      });
+    });
+  }
+
+  function updateActivityDuration() {
+    // 計算結果は登録済みカード側に表示する
+  }
+
+  function formatTotalActivityDuration(entries) {
+    let totalMinutes = 0;
+
+    normalizeActivityEntries(entries).forEach(entry => {
+      const minutes = durationMinutes(entry.start, entry.end);
+      if (minutes !== null) totalMinutes += minutes;
+    });
+
+    if (totalMinutes <= 0) return "0時間";
+
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+
+    if (m === 0) return `${h}時間`;
+    if (h === 0) return `${m}分`;
+    return `${h}時間${m}分`;
+  }
+
+  function durationMinutes(start, end) {
+    if (!start || !end) return null;
+
+    const startMin = timeToMinutes(start);
+    const endMin = timeToMinutes(end);
+    if (startMin === null || endMin === null) return null;
+
+    let diff = endMin - startMin;
+    if (diff < 0) diff += 24 * 60;
+
+    return diff;
+  }
+
+  function formatDuration(start, end) {
+    const diff = durationMinutes(start, end);
+    if (diff === null) return "";
+
+    const h = Math.floor(diff / 60);
+    const m = diff % 60;
+
+    if (h && m) return `${h}時間${m}分`;
+    if (h) return `${h}時間`;
+    return `${m}分`;
+  }
+
+  function timeToMinutes(value) {
+    const m = String(value || "").match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+
+    const h = Number(m[1]);
+    const min = Number(m[2]);
+    if (h < 0 || h > 23 || min < 0 || min > 59) return null;
+
+    return h * 60 + min;
+  }
+
+  // ── Item Sheet ───────────────────────────────────────────────
   function openItemSheet(item = null) {
     document.getElementById("itemSheetTitle").textContent = item ? "項目を編集" : "項目を追加";
     editingItemSheetId.value = item?.id || "";
-    itemNameInput.value = item?.name || "";
-    itemSubInput.value = item?.sub || "";
+    itemNameInput.value    = item?.name    || "";
+    itemSubInput.value     = item?.sub     || "";
     itemAddressInput.value = item?.address || "";
-    itemKeyInput.value = item?.key || "";
+    itemKeyInput.value     = item?.key     || "";
     document.getElementById("itemDeleteBtn").style.visibility = item ? "visible" : "hidden";
     itemSheetBackdrop.classList.add("show");
   }
 
-  function closeItemSheet() {
-    itemSheetBackdrop.classList.remove("show");
-  }
+  function closeItemSheet() { itemSheetBackdrop.classList.remove("show"); }
 
   function saveItemFromSheet() {
-    const id = editingItemSheetId.value;
+    const id   = editingItemSheetId.value;
     const name = itemNameInput.value.trim();
-
-    if (id && !name) {
-      deleteItemById(id);
-      closeItemSheet();
-      return;
-    }
-
-    if (!name) {
-      alert("場所・物件を入力してください。");
-      return;
-    }
-
+    if (id && !name) { deleteItemById(id); closeItemSheet(); return; }
+    if (!name) { alert("場所・物件を入力してください。"); return; }
     const item = {
-      id: id || makeId("place"),
-      type: "place",
-      name,
-      sub: itemSubInput.value.trim(),
+      id: id || makeId("place"), type: "place",
+      name, sub: itemSubInput.value.trim(),
       address: itemAddressInput.value.trim(),
       key: itemKeyInput.value.trim()
     };
-
     const idx = state.items.findIndex(x => x.id === item.id);
     if (idx >= 0) state.items[idx] = item;
     else state.items.push(item);
-
     saveState();
     closeItemSheet();
     renderCalendar(false);
@@ -1028,10 +1753,8 @@
   function deleteItemFromSheet() {
     const id = editingItemSheetId.value;
     if (!id) return;
-
     const item = state.items.find(x => x.id === id);
     if (!item || item.type === "activity") return;
-
     if (!confirm(`「${item.name}」を削除しますか？\nこの項目の予定も削除されます。`)) return;
     deleteItemById(id);
     closeItemSheet();
@@ -1046,6 +1769,111 @@
     renderCalendar(false);
   }
 
+  // ── Item Detail Sheet ────────────────────────────────────────
+  function openItemDetailSheet(item) {
+    if (!item || item.type === "activity") return;
+
+    currentDetailItemId = item.id;
+
+    const row = (label, value, cls = "") => `
+      <div class="detail-row">
+        <div class="detail-row-label">${label}</div>
+        <div class="detail-row-value ${value ? cls : "empty"}">${value ? escapeHtml(value) : "未設定"}</div>
+      </div>
+    `;
+
+    itemDetailCard.innerHTML = `
+      <div class="item-detail-card">
+        <div class="detail-header">
+          <div class="detail-name">${escapeHtml(item.name || "")}</div>
+          ${item.sub ? `<div class="detail-sub">${escapeHtml(item.sub)}</div>` : ""}
+        </div>
+        <div class="detail-rows">
+          ${row("住所", item.address)}
+          ${row("鍵番号", item.key, "key-value")}
+        </div>
+      </div>
+    `;
+
+    itemDetailBackdrop.classList.add("show");
+  }
+
+  function closeItemDetailSheet() {
+    itemDetailBackdrop.classList.remove("show");
+    currentDetailItemId = "";
+  }
+
+  // ── Item press: tap = detail, long-press = edit ───────────────
+  // 方針：pointerdown/pointermove/pointerup の1系統のみ使う。
+  //       touchstart/end や click は追加しない（二重発火の原因）。
+  //       pointerleave は使わない（スクロール中に誤キャンセルする）。
+  //       左セルでは calendarGrid のバブリングハンドラを止める。
+  function setupItemPress(el, item) {
+    let active = false;
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let startSL = 0;
+    let startST = 0;
+
+    function cancel() {
+      active = false;
+      pointerId = null;
+      el.classList.remove("long-pressing");
+      try { el.releasePointerCapture && el.releasePointerCapture(pointerId); } catch {}
+    }
+
+    el.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      if (active) return;
+
+      e.stopPropagation();
+
+      active = true;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      startSL = calendarScroll.scrollLeft;
+      startST = calendarScroll.scrollTop;
+
+      try { el.setPointerCapture(e.pointerId); } catch {}
+    });
+
+    el.addEventListener("pointermove", (e) => {
+      if (!active || e.pointerId !== pointerId) return;
+
+      const moved =
+        Math.abs(e.clientX - startX) > 10 ||
+        Math.abs(e.clientY - startY) > 10 ||
+        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - startST) > 10;
+
+      if (moved) cancel();
+    });
+
+    el.addEventListener("pointerup", (e) => {
+      if (!active || e.pointerId !== pointerId) return;
+
+      const scrolled =
+        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - startST) > 10;
+
+      cancel();
+
+      if (!scrolled) {
+        e.stopPropagation();
+        openItemDetailSheet(item);
+      }
+    });
+
+    el.addEventListener("pointercancel", cancel);
+
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  // ── Colour palette / people ──────────────────────────────────
   function renderColorPalette() {
     colorPalette.innerHTML = "";
     COLORS.forEach(color => {
@@ -1053,10 +1881,7 @@
       btn.type = "button";
       btn.className = "color-dot" + (selectedColor === color ? " selected" : "");
       btn.style.setProperty("--dot", color);
-      btn.onclick = () => {
-        selectedColor = color;
-        renderColorPalette();
-      };
+      btn.onclick = () => { selectedColor = color; renderColorPalette(); };
       colorPalette.appendChild(btn);
     });
   }
@@ -1068,44 +1893,38 @@
     eventPeopleInput.value = value || "";
   }
 
-  function setupLongPress(el, callback) {
-    let timer = null;
-    el.addEventListener("pointerdown", () => {
-      el.classList.add("long-pressing");
-      timer = setTimeout(() => {
-        el.classList.remove("long-pressing");
-        callback();
-      }, 650);
-    });
-
-    ["pointermove", "pointerup", "pointercancel", "pointerleave"].forEach(type => {
-      el.addEventListener(type, () => {
-        clearTimeout(timer);
-        el.classList.remove("long-pressing");
-      });
-    });
+  // ── Display helpers ──────────────────────────────────────────
+  function getTopDisplayName(item) {
+    const idMap = {
+      "place_lakewest_4711":    "レイクウエスト",
+      "place_kohan_sauna_4656": "湖辺のくつろぎ、時々サウナ",
+      "place_lake_terrace_6904":"LAKE Terrace",
+      "place_takashima_best_so":"TAKASHIMA BEST SO",
+      "place_fusha_biwako_1011":"風車村 びわ湖の家",
+      "place_koco_1220":        "湖Co",
+      "place_lake_terrace_4661":"LAKE Terrace"
+    };
+    if (idMap[item.id]) return idMap[item.id];
+    return String(item.name || "")
+      .replace(/\s*\([^)]*\)\s*/g, " ")
+      .replace(/\s+\d+-\d+.*$/g, "")
+      .trim();
   }
 
-
-  function setupCellTapHandler() {
-    let downCell = null;
+  // ── Cell tap handler (grid cells only) ───────────────────────
+  function setupCalendarCellPress(cell, dateStr, itemId) {
+    let active = false;
+    let pointerId = null;
     let startX = 0;
     let startY = 0;
-    let startScrollLeft = 0;
-    let startScrollTop = 0;
-    let lastOpenAt = 0;
+    let startSL = 0;
+    let startST = 0;
+    let openedAt = 0;
 
-    function openCell(cell) {
-      if (!cell) return;
-
-      // 二重発火防止
+    function open() {
       const now = Date.now();
-      if (now - lastOpenAt < 250) return;
-      lastOpenAt = now;
-
-      const dateStr = cell.dataset.date;
-      const itemId = cell.dataset.itemId;
-      if (!dateStr || !itemId) return;
+      if (now - openedAt < 250) return;
+      openedAt = now;
 
       const item = state.items.find(x => x.id === itemId);
       if (item?.type === "activity") {
@@ -1115,79 +1934,80 @@
       }
     }
 
-    function rememberDown(e) {
-      const cell = e.target.closest(".cal-cell");
-      if (!cell) {
-        downCell = null;
-        return;
+    function cancel() {
+      active = false;
+      pointerId = null;
+      try { cell.releasePointerCapture && cell.releasePointerCapture(pointerId); } catch {}
+    }
+
+    cell.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+
+      active = true;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      startSL = calendarScroll.scrollLeft;
+      startST = calendarScroll.scrollTop;
+
+      try { cell.setPointerCapture(e.pointerId); } catch {}
+    });
+
+    cell.addEventListener("pointermove", (e) => {
+      if (!active || e.pointerId !== pointerId) return;
+
+      const moved =
+        Math.abs(e.clientX - startX) > 10 ||
+        Math.abs(e.clientY - startY) > 10 ||
+        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - startST) > 10;
+
+      if (moved) cancel();
+    });
+
+    cell.addEventListener("pointerup", (e) => {
+      if (!active || e.pointerId !== pointerId) return;
+
+      const moved =
+        Math.abs(e.clientX - startX) > 10 ||
+        Math.abs(e.clientY - startY) > 10 ||
+        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - startST) > 10;
+
+      cancel();
+
+      if (!moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        open();
       }
+    });
 
-      downCell = cell;
-      startX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
-      startY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
-      startScrollLeft = calendarScroll.scrollLeft;
-      startScrollTop = calendarScroll.scrollTop;
-    }
+    cell.addEventListener("pointercancel", cancel);
 
-    function maybeOpenFromUp(e) {
-      if (!downCell) return;
-
-      const x = e.clientX ?? (e.changedTouches && e.changedTouches[0]?.clientX) ?? startX;
-      const y = e.clientY ?? (e.changedTouches && e.changedTouches[0]?.clientY) ?? startY;
-
-      const dx = Math.abs(x - startX);
-      const dy = Math.abs(y - startY);
-      const scrollDx = Math.abs(calendarScroll.scrollLeft - startScrollLeft);
-      const scrollDy = Math.abs(calendarScroll.scrollTop - startScrollTop);
-
-      const cell = downCell;
-      downCell = null;
-
-      // 横スクロール・縦スクロールした場合は開かない。軽い指ブレだけなら開く。
-      if (dx > 12 || dy > 12 || scrollDx > 12 || scrollDy > 12) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-      openCell(cell);
-    }
-
-    // Pointer Events 対応ブラウザ用
-    calendarGrid.addEventListener("pointerdown", rememberDown, true);
-    calendarGrid.addEventListener("pointerup", maybeOpenFromUp, true);
-    calendarGrid.addEventListener("pointercancel", () => {
-      downCell = null;
-    }, true);
-
-    // iOS Safari などで pointer/click が不安定な場合の保険
-    calendarGrid.addEventListener("touchstart", rememberDown, { capture: true, passive: true });
-    calendarGrid.addEventListener("touchend", maybeOpenFromUp, { capture: true, passive: false });
-    calendarGrid.addEventListener("touchcancel", () => {
-      downCell = null;
-    }, true);
-
-    // 最後の保険：通常clickでも開く
-    calendarGrid.addEventListener("click", (e) => {
+    // pointer系が効かない環境の保険
+    cell.addEventListener("click", (e) => {
       if (calendarScroll.dataset.suppressClick === "1") return;
-
-      const cell = e.target.closest(".cal-cell");
-      if (!cell) return;
-
       e.preventDefault();
       e.stopPropagation();
-      openCell(cell);
-    }, true);
+      open();
+    });
   }
 
+  function setupCellTapHandler() {
+    // 各セルに setupCalendarCellPress で直接イベントを付けるため、ここでは何もしない
+  }
+
+  // ── Mobile scroll guard ───────────────────────────────────────
   function setupMobileScrollGuard() {
     let tracking = false;
-    let startX = 0;
-    let startY = 0;
+    let startX   = 0;
+    let startY   = 0;
     let startScrollTop = 0;
     let startedOnLeftColumn = false;
 
     calendarScroll.addEventListener("touchstart", (e) => {
       if (!e.touches || e.touches.length !== 1) return;
-
       const t = e.touches[0];
       tracking = true;
       startX = t.clientX;
@@ -1198,194 +2018,127 @@
 
     calendarScroll.addEventListener("touchmove", (e) => {
       if (!tracking || !e.touches || e.touches.length !== 1) return;
-
       const t = e.touches[0];
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
-      const absX = Math.abs(dx);
-      const absY = Math.abs(dy);
-
-      // 左列から始めた操作だけ縦スクロールを許可する
-      if (startedOnLeftColumn) {
-        return;
-      }
-
-      // カレンダー本体から始めた操作では、縦方向の動きを止める。
-      // 横スワイプはブラウザ標準の横スクロールに任せる。
-      if (absY > absX || absY > 3) {
+      if (startedOnLeftColumn) return;
+      if (Math.abs(dy) > Math.abs(dx) || Math.abs(dy) > 3) {
         calendarScroll.scrollTop = startScrollTop;
       }
-
-      // 縦スワイプが強い場合はページ/表の縦スクロール自体を止める
-      if (absY > absX && absY > 6) {
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 6) {
         e.preventDefault();
       }
     }, { passive: false });
 
-    calendarScroll.addEventListener("touchend", () => {
-      tracking = false;
-    }, { passive: true });
-
-    calendarScroll.addEventListener("touchcancel", () => {
-      tracking = false;
-    }, { passive: true });
-
-    // 慣性などで本体側タッチ後に縦位置が少し動いた場合の保険
+    calendarScroll.addEventListener("touchend",   () => { tracking = false; }, { passive: true });
+    calendarScroll.addEventListener("touchcancel", () => { tracking = false; }, { passive: true });
     calendarScroll.addEventListener("scroll", () => {
-      if (tracking && !startedOnLeftColumn) {
-        // 横スクロール中の微妙な縦ズレを戻す
-        calendarScroll.scrollTop = startScrollTop;
-      }
+      if (tracking && !startedOnLeftColumn) calendarScroll.scrollTop = startScrollTop;
     }, { passive: true });
   }
 
+  // ── Drag scroll (mouse) ───────────────────────────────────────
   function setupCalendarDragScroll() {
-    let isDown = false;
-    let startX = 0;
-    let startY = 0;
+    let isDown  = false;
+    let startX  = 0;
+    let startY  = 0;
     let startScrollLeft = 0;
-    let startScrollTop = 0;
-    let moved = false;
-    let activePointerId = null;
+    let startScrollTop  = 0;
+    let moved   = false;
+    let activePointerId  = null;
     let startOnLeftColumn = false;
-
-    let lastX = 0;
-    let lastT = 0;
+    let lastX   = 0;
+    let lastT   = 0;
     let velocity = 0;
-    let rafId = null;
+    let rafId   = null;
 
     function cancelMomentum() {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
+      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
     }
-
     function startMomentum(v) {
       cancelMomentum();
       velocity = v;
-
       function step() {
-        if (Math.abs(velocity) < 0.04) {
-          velocity = 0;
-          return;
-        }
-
+        if (Math.abs(velocity) < 0.04) { velocity = 0; return; }
         calendarScroll.scrollLeft += velocity * 16;
         velocity *= 0.88;
         rafId = requestAnimationFrame(step);
       }
-
       rafId = requestAnimationFrame(step);
     }
 
-    // PCで文字やセルを掴むのを防ぐ
-    calendarScroll.addEventListener("dragstart", (e) => e.preventDefault());
-    calendarScroll.addEventListener("selectstart", (e) => {
-      if (isDown) e.preventDefault();
-    });
+    calendarScroll.addEventListener("dragstart",   (e) => e.preventDefault());
+    calendarScroll.addEventListener("selectstart", (e) => { if (isDown) e.preventDefault(); });
 
     calendarScroll.addEventListener("pointerdown", (e) => {
-      // スマホ/タブレットのタッチは標準スクロールに任せる。
-      // これでセルタップが「掴むモード」になりにくくなる。
       if (e.pointerType !== "mouse") return;
-
       if (e.target.closest("button, input, select, textarea")) return;
       if (e.button !== 0) return;
-
       cancelMomentum();
       isDown = true;
-      moved = false;
-      activePointerId = e.pointerId;
-      startX = lastX = e.clientX;
+      moved  = false;
+      activePointerId  = e.pointerId;
+      startX = lastX   = e.clientX;
       startY = e.clientY;
-      lastT = e.timeStamp;
-      startScrollLeft = calendarScroll.scrollLeft;
-      startScrollTop = calendarScroll.scrollTop;
+      lastT  = e.timeStamp;
+      startScrollLeft  = calendarScroll.scrollLeft;
+      startScrollTop   = calendarScroll.scrollTop;
       startOnLeftColumn = !!e.target.closest(".left-cell, .corner");
       velocity = 0;
-      calendarScroll.dataset.downDate = e.target.closest(".cal-cell")?.dataset.date || "";
+      calendarScroll.dataset.downDate   = e.target.closest(".cal-cell")?.dataset.date   || "";
       calendarScroll.dataset.downItemId = e.target.closest(".cal-cell")?.dataset.itemId || "";
-
       calendarScroll.classList.add("dragging");
-
       try { calendarScroll.setPointerCapture(e.pointerId); } catch {}
     });
 
     calendarScroll.addEventListener("pointermove", (e) => {
       if (!isDown || e.pointerId !== activePointerId) return;
-
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
-
       if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
-
       if (moved) {
         const dt = e.timeStamp - lastT || 1;
         velocity = -(e.clientX - lastX) / dt;
-        lastX = e.clientX;
-        lastT = e.timeStamp;
-
+        lastX    = e.clientX;
+        lastT    = e.timeStamp;
         calendarScroll.scrollLeft = startScrollLeft - dx;
-
-        // 縦方向のスクロールは左の項目列/項目日付セルから始めた時だけ動かす
-        if (startOnLeftColumn) {
-          calendarScroll.scrollTop = startScrollTop - dy;
-        }
-
+        if (startOnLeftColumn) calendarScroll.scrollTop = startScrollTop - dy;
         e.preventDefault();
       }
     }, { passive: false });
 
     calendarScroll.addEventListener("pointerup", (e) => {
       if (!isDown || e.pointerId !== activePointerId) return;
-
       const wasMoved = moved;
-      isDown = false;
-      moved = false;
-      activePointerId = null;
-      startOnLeftColumn = false;
+      isDown = false; moved = false; activePointerId = null; startOnLeftColumn = false;
       calendarScroll.classList.remove("dragging");
-
       try { calendarScroll.releasePointerCapture(e.pointerId); } catch {}
-
       if (wasMoved) {
         calendarScroll.dataset.suppressClick = "1";
-        setTimeout(() => {
-          delete calendarScroll.dataset.suppressClick;
-        }, 250);
+        setTimeout(() => { delete calendarScroll.dataset.suppressClick; }, 250);
         startMomentum(velocity);
       } else {
         const dateStr = calendarScroll.dataset.downDate;
-        const itemId = calendarScroll.dataset.downItemId;
-
+        const itemId  = calendarScroll.dataset.downItemId;
         delete calendarScroll.dataset.downDate;
         delete calendarScroll.dataset.downItemId;
-
         if (dateStr && itemId) {
           const item = state.items.find(x => x.id === itemId);
-          if (item?.type === "activity") {
-            editActivityTime(dateStr);
-          } else {
-            openEventSheet(dateStr, itemId);
-          }
+          if (item?.type === "activity") editActivityTime(dateStr);
+          else openEventSheet(dateStr, itemId);
         }
       }
     });
 
     calendarScroll.addEventListener("click", (e) => {
       if (calendarScroll.dataset.suppressClick === "1") {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         delete calendarScroll.dataset.suppressClick;
       }
     }, true);
 
     calendarScroll.addEventListener("pointercancel", () => {
-      isDown = false;
-      moved = false;
-      activePointerId = null;
-      startOnLeftColumn = false;
+      isDown = false; moved = false; activePointerId = null; startOnLeftColumn = false;
       calendarScroll.classList.remove("dragging");
       delete calendarScroll.dataset.downDate;
       delete calendarScroll.dataset.downItemId;
@@ -1393,14 +2146,7 @@
     });
 
     calendarScroll.addEventListener("wheel", (e) => {
-      const onLeftColumn = !!e.target.closest(".left-cell, .corner");
-
-      // 左列上だけ縦スクロールを許可
-      if (onLeftColumn) {
-        return;
-      }
-
-      // カレンダー本体では縦ホイールを横移動に変換
+      if (!!e.target.closest(".left-cell, .corner")) return;
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.shiftKey) {
         calendarScroll.scrollLeft += e.deltaY;
         e.preventDefault();
@@ -1408,6 +2154,7 @@
     }, { passive: false });
   }
 
+  // ── Utilities ────────────────────────────────────────────────
   function scrollToDate(dateStr) {
     const target = calendarGrid.querySelector(`.date-head[data-date="${dateStr}"]`);
     if (!target) return;
@@ -1415,13 +2162,7 @@
   }
 
   function exportBackup() {
-    const data = {
-      app: "Cleaning Calendar Grid",
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      state
-    };
-
+    const data = { app: "Cleaning Calendar Grid", version: 1, exportedAt: new Date().toISOString(), state };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -1433,29 +2174,25 @@
   async function importBackup(e) {
     const file = e.target.files[0];
     if (!file) return;
-
     try {
       const text = await file.text();
       const data = JSON.parse(text);
       const imported = data.state || data;
-
       if (!imported || !Array.isArray(imported.items)) throw new Error("invalid");
       if (!confirm("現在のデータをバックアップ内容で置き換えますか？")) return;
-
       state = {
         items: imported.items,
         events: imported.events || {},
-        activityTimes: imported.activityTimes || {}
+        activityTimes: imported.activityTimes || {},
+        activityContents: Array.isArray(imported.activityContents) ? imported.activityContents : DEFAULT_ACTIVITY_CONTENTS.slice(),
+        activityStaffs: Array.isArray(imported.activityStaffs) ? imported.activityStaffs : DEFAULT_ACTIVITY_STAFFS.slice()
       };
-
       saveState();
       renderCalendar(true);
       alert("復元しました。");
     } catch {
       alert("復元に失敗しました。JSONファイルを確認してください。");
-    } finally {
-      e.target.value = "";
-    }
+    } finally { e.target.value = ""; }
   }
 
   function toDateString(date) {
@@ -1465,9 +2202,7 @@
     return `${y}-${m}-${d}`;
   }
 
-  function isToday(date) {
-    return toDateString(date) === toDateString(new Date());
-  }
+  function isToday(date) { return toDateString(date) === toDateString(new Date()); }
 
   function makeId(prefix = "id") {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -1480,28 +2215,17 @@
     return n.endsWith("様") ? n : n + "様";
   }
 
-  function removeSama(name) {
-    return String(name || "").replace(/様$/, "");
-  }
-
-  function unique(arr) {
-    return [...new Set(arr.map(v => String(v).trim()).filter(Boolean))];
-  }
+  function removeSama(name) { return String(name || "").replace(/様$/, ""); }
 
   function escapeHtml(str) {
     return String(str ?? "").replace(/[&<>"']/g, s => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
     }[s]));
   }
 
-  function escapeAttr(str) {
-    return escapeHtml(str).replace(/`/g, "&#096;");
-  }
+  function escapeAttr(str) { return escapeHtml(str).replace(/`/g, "&#096;"); }
 
+  // ── Boot ─────────────────────────────────────────────────────
   setupCellTapHandler();
   setupMobileScrollGuard();
   setupCalendarDragScroll();
