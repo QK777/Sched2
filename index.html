@@ -476,8 +476,29 @@
 
     .time-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 8px;
+      align-items: end;
+    }
+
+    .time-row > div {
+      min-width: 0;
+    }
+
+    .time-row label {
+      font-size: 11px;
+      line-height: 1.1;
+      margin-bottom: 5px;
+      white-space: nowrap;
+    }
+
+    .time-row input[type="time"] {
+      width: 100%;
+      min-width: 0;
+      padding-left: 6px;
+      padding-right: 6px;
+      font-size: 14px;
+      text-align: center;
     }
 
     .palette {
@@ -766,6 +787,18 @@
     .detail-edit-icon-button:active {
       transform: scale(0.94);
       background: rgba(106,166,255,.24);
+    }
+
+    @media (max-width: 390px) {
+      .time-row {
+        gap: 6px;
+      }
+
+      .time-row input[type="time"] {
+        font-size: 13px;
+        padding-left: 4px;
+        padding-right: 4px;
+      }
     }
 
     @media (min-width: 820px) {
