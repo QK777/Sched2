@@ -107,7 +107,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      touch-action: pan-x pan-y;
+      touch-action: auto;
       overscroll-behavior: contain;
     }
 
@@ -1178,6 +1178,67 @@
     }, true);
   }
 
+  function setupMobileScrollGuard() {
+    let tracking = false;
+    let startX = 0;
+    let startY = 0;
+    let startScrollTop = 0;
+    let startedOnLeftColumn = false;
+
+    calendarScroll.addEventListener("touchstart", (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      tracking = true;
+      startX = t.clientX;
+      startY = t.clientY;
+      startScrollTop = calendarScroll.scrollTop;
+      startedOnLeftColumn = !!e.target.closest(".left-cell, .corner");
+    }, { passive: true });
+
+    calendarScroll.addEventListener("touchmove", (e) => {
+      if (!tracking || !e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+
+      // 左列から始めた操作だけ縦スクロールを許可する
+      if (startedOnLeftColumn) {
+        return;
+      }
+
+      // カレンダー本体から始めた操作では、縦方向の動きを止める。
+      // 横スワイプはブラウザ標準の横スクロールに任せる。
+      if (absY > absX || absY > 3) {
+        calendarScroll.scrollTop = startScrollTop;
+      }
+
+      // 縦スワイプが強い場合はページ/表の縦スクロール自体を止める
+      if (absY > absX && absY > 6) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    calendarScroll.addEventListener("touchend", () => {
+      tracking = false;
+    }, { passive: true });
+
+    calendarScroll.addEventListener("touchcancel", () => {
+      tracking = false;
+    }, { passive: true });
+
+    // 慣性などで本体側タッチ後に縦位置が少し動いた場合の保険
+    calendarScroll.addEventListener("scroll", () => {
+      if (tracking && !startedOnLeftColumn) {
+        // 横スクロール中の微妙な縦ズレを戻す
+        calendarScroll.scrollTop = startScrollTop;
+      }
+    }, { passive: true });
+  }
+
   function setupCalendarDragScroll() {
     let isDown = false;
     let startX = 0;
@@ -1442,6 +1503,7 @@
   }
 
   setupCellTapHandler();
+  setupMobileScrollGuard();
   setupCalendarDragScroll();
   renderCalendar(true);
   setTimeout(() => scrollToDate(toDateString(new Date())), 80);
