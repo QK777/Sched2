@@ -476,377 +476,89 @@
 
     .time-row {
       display: grid;
-      grid-template-columns: 94px 94px;
-      gap: 8px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 3%;
       align-items: end;
-      justify-content: center;
-    }
-
-    .time-row > div {
-      min-width: 0;
-      width: 94px;
-      max-width: 94px;
-    }
-
-    .time-row label {
-      font-size: 11px;
-      line-height: 1.1;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      text-align: center;
-    }
-
-    .time-row input[type="time"] {
-      appearance: none;
-      -webkit-appearance: none;
-      display: block;
-      box-sizing: border-box;
-      inline-size: 94px;
-      width: 94px;
-      max-width: 94px;
-      min-width: 0;
-      min-inline-size: 0;
-      padding: 8px 2px;
-      font-size: 11px;
-      line-height: 1;
-      text-align: center;
-      letter-spacing: -0.04em;
-    }
-
-    .time-row input[type="time"]::-webkit-calendar-picker-indicator {
-      margin: 0;
-      padding: 0;
-      width: 13px;
-      opacity: .8;
-    }
-
-    .palette {
-      display: flex;
-      gap: 10px;
-      padding: 4px 0 2px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .palette::-webkit-scrollbar { display: none; }
-
-    .color-dot {
-      width: 34px;
-      height: 34px;
-      min-width: 34px;
-      border-radius: 999px;
-      border: 3px solid transparent;
-      padding: 0;
-      background: var(--dot);
-      box-shadow: 0 0 0 1px rgba(255,255,255,.18);
-    }
-
-    .color-dot.selected {
-      border-color: #fff;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .actions button {
-      padding: 8px 10px;
-      font-size: 13px;
-      border-radius: 10px;
-    }
-
-    .delete {
-      background: #3a1d22;
-      color: #ff9aa2;
-    }
-
-    .save {
-      background: var(--accent);
-      color: #06101f;
-    }
-
-    .hint {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.55;
-      margin-top: 8px;
-    }
-
-    .select-add-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: end;
-    }
-
-    .add-small {
-      height: 46px;
-      padding: 0 12px;
-      white-space: nowrap;
-    }
-
-    .activity-list {
-      display: grid;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .activity-list-card {
       width: 100%;
-      text-align: left;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-      border-radius: 14px;
-      padding: 10px;
-      display: grid;
-      gap: 4px;
     }
 
-    .activity-list-time {
-      font-size: 17px;
-      font-weight: 900;
-      color: var(--text);
+    .time-field {
+      min-width: 0;
+      width: 100%;
     }
 
-    .activity-list-meta {
-      font-size: 13px;
-      color: #d1d5db;
-      line-height: 1.35;
-      overflow-wrap: anywhere;
-    }
-
-    .activity-editor {
-      display: none;
-      border: 1px solid rgba(106,166,255,.25);
-      border-radius: 16px;
-      padding: 12px;
-      margin: 12px 0;
-      background: rgba(106,166,255,.06);
-    }
-
-    .activity-editor.show { display: block; }
-
-    .activity-list-duration {
-      color: #facc15;
-      font-size: 14px;
-      font-weight: 950;
-      line-height: 1.2;
-    }
-
-    .activity-staff-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      min-height: 36px;
-      padding: 8px;
-      margin-top: 8px;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.035);
-    }
-
-    .activity-staff-tag {
-      border: 1px solid rgba(106,166,255,.35);
-      background: rgba(106,166,255,.16);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .activity-staff-tag.removing {
-      outline: 2px solid rgba(255,91,91,.75);
-      background: rgba(255,91,91,.18);
-    }
-
-    .activity-staff-empty {
-      color: var(--muted);
+    .time-field label {
       font-size: 12px;
-      align-self: center;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      text-align: center;
     }
 
-    .activity-add-row {
-      display: flex;
-      justify-content: center;
-      margin: 10px 0 4px;
-    }
-
-    .activity-add-button {
-      width: 46px;
-      height: 46px;
-      min-width: 46px;
-      padding: 0;
-      border-radius: 999px;
-      background: rgba(106,166,255,.16);
-      border: 1px solid rgba(106,166,255,.35);
-      color: var(--text);
-      font-size: 26px;
-      line-height: 1;
+    .time-picker {
+      width: 100%;
       display: grid;
-      place-items: center;
-    }
-
-    .activity-edit-actions {
-      margin-top: 10px;
-      grid-template-columns: repeat(3, max-content);
-      justify-content: end;
-    }
-
-    .activity-edit-actions button {
-      min-width: 64px;
-      padding: 7px 10px;
-      font-size: 12px;
-    }
-
-    /* ── Item Detail Card ── */
-    .item-detail-card {
-      border-radius: 18px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .detail-header {
-      padding: 18px 18px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .detail-name {
-      font-size: 19px;
-      font-weight: 900;
-      line-height: 1.3;
-      overflow-wrap: anywhere;
-      margin-bottom: 4px;
-    }
-
-    .detail-sub {
-      font-size: 14px;
-      color: #a0aec0;
-      font-weight: 600;
-      overflow-wrap: anywhere;
-    }
-
-    .detail-rows {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .detail-row {
-      display: grid;
-      grid-template-columns: 72px 1fr;
+      grid-template-columns: 44% 8% 44%;
       align-items: center;
-      gap: 12px;
-      padding: 13px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      gap: 2%;
+      border: 1px solid var(--border);
+      background: #10131b;
+      border-radius: 12px;
+      padding: 6%;
     }
 
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-
-    .detail-row-label {
-      font-size: 11px;
-      font-weight: 700;
+    .time-picker span {
       color: var(--muted);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .detail-row-value {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      overflow-wrap: anywhere;
-    }
-
-    .detail-row-value.empty {
-      color: rgba(156,163,175,0.4);
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    .detail-row-value.key-value {
-      font-size: 18px;
-      font-weight: 950;
-      color: #facc15;
-      letter-spacing: 0.05em;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .detail-edit-row {
-      margin-top: 14px;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .detail-edit-icon-button {
-      width: 44px;
-      height: 44px;
-      min-width: 44px;
-      padding: 0;
-      border-radius: 999px;
-      border: 1px solid rgba(106,166,255,.35);
-      background: rgba(106,166,255,.16);
-      color: var(--text);
-      font-size: 22px;
+      font-weight: 900;
+      font-size: clamp(13px, 4vw, 16px);
       line-height: 1;
-      display: grid;
-      place-items: center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      text-align: center;
     }
 
-    .detail-edit-icon-button:active {
-      transform: scale(0.94);
-      background: rgba(106,166,255,.24);
+    .time-picker select {
+      width: 100%;
+      min-width: 0;
+      height: 2.6em;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: clamp(13px, 4vw, 16px);
+      font-weight: 850;
+      text-align: center;
+      text-align-last: center;
+      appearance: auto;
+      -webkit-appearance: menulist;
     }
 
     @media (max-width: 390px) {
       .time-row {
-        grid-template-columns: 88px 88px;
-        gap: 6px;
+        gap: 2.5%;
       }
 
-      .time-row > div {
-        width: 88px;
-        max-width: 88px;
+      .time-picker {
+        padding: 5%;
+        grid-template-columns: 43% 8% 43%;
+        gap: 3%;
       }
 
-      .time-row input[type="time"] {
-        inline-size: 88px;
-        width: 88px;
-        max-width: 88px;
-        font-size: 10px;
-        padding-left: 1px;
-        padding-right: 1px;
+      .time-picker select {
+        height: 2.5em;
       }
     }
 
     @media (max-width: 350px) {
       .time-row {
-        grid-template-columns: 82px 82px;
-        gap: 5px;
+        gap: 2%;
       }
 
-      .time-row > div {
-        width: 82px;
-        max-width: 82px;
+      .time-picker {
+        padding: 4%;
       }
 
-      .time-row input[type="time"] {
-        inline-size: 82px;
-        width: 82px;
-        max-width: 82px;
-        font-size: 9px;
-        padding-left: 1px;
-        padding-right: 1px;
+      .time-picker select {
+        height: 2.4em;
       }
     }
 
@@ -974,13 +686,23 @@
 
     <div class="activity-editor" id="activityEditor">
       <div class="time-row">
-        <div>
-          <label>開始</label>
-          <input type="time" id="activityStartInput">
+        <div class="time-field">
+          <label>開始時間</label>
+          <input type="hidden" id="activityStartInput">
+          <div class="time-picker">
+            <select id="activityStartHour" aria-label="開始 時"></select>
+            <span>:</span>
+            <select id="activityStartMinute" aria-label="開始 分"></select>
+          </div>
         </div>
-        <div>
-          <label>終了</label>
-          <input type="time" id="activityEndInput">
+        <div class="time-field">
+          <label>終了時間</label>
+          <input type="hidden" id="activityEndInput">
+          <div class="time-picker">
+            <select id="activityEndHour" aria-label="終了 時"></select>
+            <span>:</span>
+            <select id="activityEndMinute" aria-label="終了 分"></select>
+          </div>
         </div>
       </div>
 
@@ -1092,21 +814,21 @@
   const activityEditor       = document.getElementById("activityEditor");
   const activityStartInput   = document.getElementById("activityStartInput");
   const activityEndInput     = document.getElementById("activityEndInput");
+  const activityStartHour    = document.getElementById("activityStartHour");
+  const activityStartMinute  = document.getElementById("activityStartMinute");
+  const activityEndHour      = document.getElementById("activityEndHour");
+  const activityEndMinute    = document.getElementById("activityEndMinute");
   const activityContentInput = document.getElementById("activityContentInput");
   const activityStaffInput   = document.getElementById("activityStaffInput");
   const activityStaffTags    = document.getElementById("activityStaffTags");
   const activityDuration     = null;
 
-  activityStartInput.addEventListener("focus", () => {
-    if (!activityStartInput.value) activityStartInput.value = "09:00";
+  [activityStartHour, activityStartMinute, activityEndHour, activityEndMinute].forEach(select => {
+    select.addEventListener("change", () => {
+      syncActivityTimeInputsFromPicker();
+      updateActivityDuration();
+    });
   });
-
-  activityEndInput.addEventListener("focus", () => {
-    if (!activityEndInput.value) activityEndInput.value = "09:00";
-  });
-
-  activityStartInput.addEventListener("input", updateActivityDuration);
-  activityEndInput.addEventListener("input", updateActivityDuration);
 
   activityStaffInput.addEventListener("change", () => {
     if (activityStaffInput.value) {
@@ -1489,6 +1211,7 @@
     activityEditingId.value = editing.id;
     activityStartInput.value = editing.start || "09:00";
     activityEndInput.value = editing.end || "09:00";
+    syncActivityTimePickerFromInputs();
     renderActivityContentOptions(editing.content || "");
     activitySelectedStaffs = normalizeStaffList(editing.staffs ?? editing.staff);
     renderActivityStaffOptions("");
@@ -1676,6 +1399,47 @@
     saveState();
     renderFn(newValue);
     selectEl.value = newValue;
+  }
+
+  function setupActivityTimePickers() {
+    const hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+    const minuteOptions = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
+
+    [activityStartHour, activityEndHour].forEach(select => {
+      select.innerHTML = hourOptions.map(v => `<option value="${v}">${v}</option>`).join("");
+    });
+
+    [activityStartMinute, activityEndMinute].forEach(select => {
+      select.innerHTML = minuteOptions.map(v => `<option value="${v}">${v}</option>`).join("");
+    });
+
+    activityStartInput.value = activityStartInput.value || "09:00";
+    activityEndInput.value = activityEndInput.value || "09:00";
+    syncActivityTimePickerFromInputs();
+  }
+
+  function syncActivityTimePickerFromInputs() {
+    setTimePickerValue(activityStartInput.value || "09:00", activityStartHour, activityStartMinute);
+    setTimePickerValue(activityEndInput.value || "09:00", activityEndHour, activityEndMinute);
+  }
+
+  function syncActivityTimeInputsFromPicker() {
+    activityStartInput.value = `${activityStartHour.value}:${activityStartMinute.value}`;
+    activityEndInput.value = `${activityEndHour.value}:${activityEndMinute.value}`;
+  }
+
+  function setTimePickerValue(value, hourSelect, minuteSelect) {
+    const match = String(value || "09:00").match(/^(\d{1,2}):(\d{2})$/);
+    const hour = match ? String(Number(match[1])).padStart(2, "0") : "09";
+    let minute = match ? Number(match[2]) : 0;
+
+    // 5分単位に丸める
+    minute = Math.round(minute / 5) * 5;
+    if (minute >= 60) minute = 55;
+
+    hourSelect.value = hour;
+    minuteSelect.value = String(minute).padStart(2, "0");
+    syncActivityTimeInputsFromPicker();
   }
 
   function normalizeStaffList(value) {
@@ -2308,6 +2072,7 @@
   function escapeAttr(str) { return escapeHtml(str).replace(/`/g, "&#096;"); }
 
   // ── Boot ─────────────────────────────────────────────────────
+  setupActivityTimePickers();
   setupCellTapHandler();
   setupMobileScrollGuard();
   setupCalendarDragScroll();
