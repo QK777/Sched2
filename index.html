@@ -476,29 +476,48 @@
 
     .time-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: 82px 82px;
       gap: 8px;
       align-items: end;
+      justify-content: center;
     }
 
     .time-row > div {
       min-width: 0;
+      width: 82px;
+      max-width: 82px;
     }
 
     .time-row label {
-      font-size: 11px;
-      line-height: 1.1;
-      margin-bottom: 5px;
+      font-size: 10px;
+      line-height: 1;
+      margin-bottom: 3px;
       white-space: nowrap;
+      text-align: center;
     }
 
     .time-row input[type="time"] {
-      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      display: block;
+      box-sizing: border-box;
+      inline-size: 82px;
+      width: 82px;
+      max-width: 82px;
       min-width: 0;
-      padding-left: 6px;
-      padding-right: 6px;
-      font-size: 14px;
+      min-inline-size: 0;
+      padding: 7px 1px;
+      font-size: 10px;
+      line-height: 1;
       text-align: center;
+      letter-spacing: -0.06em;
+    }
+
+    .time-row input[type="time"]::-webkit-calendar-picker-indicator {
+      margin: 0;
+      padding: 0;
+      width: 12px;
+      opacity: .8;
     }
 
     .palette {
@@ -791,13 +810,43 @@
 
     @media (max-width: 390px) {
       .time-row {
+        grid-template-columns: 76px 76px;
         gap: 6px;
       }
 
+      .time-row > div {
+        width: 76px;
+        max-width: 76px;
+      }
+
       .time-row input[type="time"] {
-        font-size: 13px;
-        padding-left: 4px;
-        padding-right: 4px;
+        inline-size: 76px;
+        width: 76px;
+        max-width: 76px;
+        font-size: 9px;
+        padding-left: 1px;
+        padding-right: 1px;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .time-row {
+        grid-template-columns: 70px 70px;
+        gap: 5px;
+      }
+
+      .time-row > div {
+        width: 70px;
+        max-width: 70px;
+      }
+
+      .time-row input[type="time"] {
+        inline-size: 70px;
+        width: 70px;
+        max-width: 70px;
+        font-size: 8px;
+        padding-left: 0;
+        padding-right: 0;
       }
     }
 
@@ -926,11 +975,11 @@
     <div class="activity-editor" id="activityEditor">
       <div class="time-row">
         <div>
-          <label>開始時間</label>
+          <label>開始</label>
           <input type="time" id="activityStartInput">
         </div>
         <div>
-          <label>終了時間</label>
+          <label>終了</label>
           <input type="time" id="activityEndInput">
         </div>
       </div>
