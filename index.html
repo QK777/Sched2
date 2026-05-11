@@ -570,6 +570,12 @@
       align-items: end;
     }
 
+    .select-add-row select {
+      height: 46px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
     .add-small {
       height: 46px;
       padding: 0 12px;
@@ -934,6 +940,534 @@
         border-right: 1px solid var(--border);
       }
     }
+
+
+    /* ─────────────────────────────────────────────
+       Design Refresh v19: dark glass + premium cards
+       機能は変えず、見た目だけを全体調整
+    ───────────────────────────────────────────── */
+    :root {
+      --bg: #080b12;
+      --panel: #121722;
+      --panel2: #1a2230;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.18);
+      --accent: #7cb7ff;
+      --accent-strong: #9d7cff;
+      --gold: #facc15;
+      --danger: #ff6b8a;
+      --glass: rgba(15, 23, 42, 0.72);
+      --glass-strong: rgba(15, 23, 42, 0.90);
+      --soft-shadow: 0 12px 34px rgba(0, 0, 0, 0.34);
+      --inner-highlight: inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(124,183,255,.45) rgba(255,255,255,.05);
+    }
+
+    *::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: rgba(255,255,255,.04);
+      border-radius: 999px;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, rgba(124,183,255,.58), rgba(157,124,255,.48));
+      border: 2px solid rgba(8,11,18,.85);
+      border-radius: 999px;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 18% -12%, rgba(124,183,255,.22), transparent 34%),
+        radial-gradient(circle at 94% 8%, rgba(157,124,255,.18), transparent 30%),
+        radial-gradient(circle at 60% 110%, rgba(250,204,21,.09), transparent 32%),
+        linear-gradient(180deg, #0a0e18 0%, #070a10 100%);
+      letter-spacing: .01em;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.024) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.7), transparent 72%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.7), transparent 72%);
+    }
+
+    .app {
+      background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,0));
+    }
+
+    header {
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(8, 11, 18, 0.78);
+      box-shadow: 0 12px 32px rgba(0,0,0,.34);
+      backdrop-filter: blur(18px) saturate(130%);
+      -webkit-backdrop-filter: blur(18px) saturate(130%);
+    }
+
+    .month-row {
+      grid-template-columns: 42px 1fr 42px;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .month-row button,
+    .top-actions button,
+    .save,
+    .add-small,
+    .corner-add,
+    .activity-add-button,
+    .detail-edit-icon-button {
+      box-shadow: var(--inner-highlight), 0 8px 20px rgba(0,0,0,.22);
+      transition: transform .14s ease, border-color .14s ease, background .14s ease, box-shadow .14s ease;
+    }
+
+    button:hover {
+      border-color: rgba(124,183,255,.45);
+      box-shadow: var(--inner-highlight), 0 10px 24px rgba(0,0,0,.30);
+    }
+
+    .month-row button {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.035));
+      font-size: 16px;
+    }
+
+    .month-title {
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        linear-gradient(135deg, rgba(124,183,255,.13), rgba(157,124,255,.09)),
+        rgba(255,255,255,.035);
+      color: #f8fafc;
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing: .04em;
+      text-shadow: 0 1px 14px rgba(124,183,255,.28);
+      box-shadow: var(--inner-highlight);
+    }
+
+    .top-actions {
+      gap: 10px;
+    }
+
+    .top-actions button {
+      min-height: 40px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 15px;
+      background:
+        linear-gradient(135deg, rgba(124,183,255,.13), rgba(255,255,255,.035));
+      color: #eaf2ff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .calendar-scroll {
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.025), rgba(255,255,255,0)),
+        transparent;
+    }
+
+    .calendar-grid {
+      background: rgba(255,255,255,.018);
+    }
+
+    .corner,
+    .date-head,
+    .left-cell {
+      background: rgba(12, 17, 27, .88);
+      backdrop-filter: blur(16px) saturate(130%);
+      -webkit-backdrop-filter: blur(16px) saturate(130%);
+      box-shadow: var(--inner-highlight);
+    }
+
+    .corner {
+      color: #cbd5e1;
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    .corner-add,
+    .activity-add-button,
+    .detail-edit-icon-button {
+      border: 1px solid rgba(124,183,255,.38);
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,.18), transparent 32%),
+        linear-gradient(135deg, rgba(124,183,255,.26), rgba(157,124,255,.16));
+      color: #f8fafc;
+    }
+
+    .date-head {
+      color: #f8fafc;
+    }
+
+    .date-head.today {
+      background:
+        radial-gradient(circle at 50% 0%, rgba(250,204,21,.26), transparent 58%),
+        linear-gradient(135deg, rgba(124,183,255,.20), rgba(157,124,255,.10)),
+        rgba(12, 17, 27, .92);
+      box-shadow: inset 0 -2px 0 rgba(250,204,21,.75), var(--inner-highlight);
+    }
+
+    .date-num {
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    .date-week {
+      margin-top: 3px;
+      color: #94a3b8;
+      font-weight: 800;
+    }
+
+    .date-head.sun .date-week { color: #ffa8b6; }
+    .date-head.sat .date-week { color: #9dccff; }
+
+    .left-cell {
+      border-right: 1px solid rgba(255,255,255,.12);
+      padding: 6px 9px 6px 11px;
+      gap: 4px;
+    }
+
+    .left-cell:not(.activity):hover {
+      background: rgba(22, 31, 48, .94);
+    }
+
+    .left-cell.activity {
+      background:
+        linear-gradient(135deg, rgba(250,204,21,.08), rgba(124,183,255,.07)),
+        rgba(12, 17, 27, .92);
+    }
+
+    .item-name {
+      color: #f8fafc;
+      font-size: 11.5px;
+      font-weight: 950;
+      line-height: 1.24;
+    }
+
+    .item-sub {
+      color: #bac7d8;
+      font-size: 10.5px;
+      font-weight: 750;
+    }
+
+    .item-key {
+      color: #8ea0b8;
+      font-weight: 850;
+    }
+
+    .item-key-value {
+      color: var(--gold);
+      text-shadow: 0 0 13px rgba(250,204,21,.32);
+    }
+
+    .cal-cell {
+      background: rgba(255,255,255,.018);
+      border-color: rgba(148,163,184,.14);
+      padding: 4px;
+    }
+
+    .cal-cell:nth-child(odd) {
+      background: rgba(255,255,255,.026);
+    }
+
+    .cal-cell.has-event {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(124,183,255,.10), transparent 68%),
+        rgba(255,255,255,.024);
+    }
+
+    .mini-card {
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,.16);
+      background:
+        radial-gradient(circle at 28% 16%, rgba(255,255,255,.24), transparent 34%),
+        var(--card-color, rgba(106,166,255,.28));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 8px 18px rgba(0,0,0,.18);
+    }
+
+    .mini-content {
+      font-size: 17px;
+      letter-spacing: .02em;
+      text-shadow: 0 2px 12px rgba(0,0,0,.28);
+    }
+
+    .mini-line {
+      color: rgba(255,255,255,.88);
+      font-weight: 850;
+    }
+
+    .activity-card {
+      border-radius: 13px;
+      border: 1px dashed rgba(148,163,184,.22);
+      background: rgba(255,255,255,.035);
+      color: #8290a6;
+    }
+
+    .activity-card.has-time {
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,.18), transparent 30%),
+        linear-gradient(135deg, rgba(250,204,21,.23), rgba(255,159,67,.11));
+      border: 1px solid rgba(250,204,21,.36);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 8px 18px rgba(0,0,0,.18);
+    }
+
+    .activity-total-time {
+      color: #ffe27a;
+      text-shadow: 0 0 16px rgba(250,204,21,.38);
+    }
+
+    .sheet-backdrop {
+      background:
+        radial-gradient(circle at 50% 100%, rgba(124,183,255,.10), transparent 40%),
+        rgba(0,0,0,.64);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .sheet {
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      padding: 16px;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,.13);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(124,183,255,.18), transparent 34%),
+        radial-gradient(circle at 86% 0%, rgba(157,124,255,.12), transparent 30%),
+        rgba(12, 17, 27, .94);
+      box-shadow: 0 24px 60px rgba(0,0,0,.54), var(--inner-highlight);
+      backdrop-filter: blur(22px) saturate(135%);
+      -webkit-backdrop-filter: blur(22px) saturate(135%);
+    }
+
+    .sheet-head {
+      margin-bottom: 14px;
+    }
+
+    .sheet h2 {
+      font-size: 19px;
+      font-weight: 950;
+      letter-spacing: .03em;
+    }
+
+    .sheet-close {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.08);
+      box-shadow: var(--inner-highlight);
+    }
+
+    label {
+      color: #aab8cc;
+      font-weight: 850;
+      letter-spacing: .03em;
+      margin: 12px 0 6px;
+    }
+
+    input,
+    textarea,
+    select {
+      border: 1px solid rgba(148,163,184,.20);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+        rgba(8, 12, 20, .82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 8px 18px rgba(0,0,0,.12);
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(124,183,255,.62);
+      box-shadow:
+        0 0 0 3px rgba(124,183,255,.14),
+        inset 0 1px 0 rgba(255,255,255,.10),
+        0 10px 20px rgba(0,0,0,.18);
+    }
+
+    textarea {
+      min-height: 82px;
+    }
+
+    .palette {
+      padding: 6px 0 4px;
+    }
+
+    .color-dot {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border: 2px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.20), 0 8px 18px rgba(0,0,0,.20);
+    }
+
+    .color-dot.selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 3px rgba(124,183,255,.22), 0 9px 20px rgba(0,0,0,.24);
+    }
+
+    .actions {
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .actions button {
+      min-height: 42px;
+      border-radius: 14px;
+      font-weight: 950;
+    }
+
+    .save {
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, #8ec5ff, #8f8cff);
+      color: #07111f;
+    }
+
+    .delete {
+      border: 1px solid rgba(255,107,138,.24);
+      background: linear-gradient(135deg, rgba(255,107,138,.18), rgba(255,255,255,.035));
+      color: #ff9dad;
+    }
+
+    .hint {
+      padding: 10px 12px;
+      border: 1px solid rgba(148,163,184,.13);
+      border-radius: 14px;
+      background: rgba(255,255,255,.035);
+      color: #9fb0c6;
+    }
+
+    .select-add-row {
+      gap: 10px;
+    }
+
+    .select-add-row select,
+    .add-small {
+      height: 46px;
+      border-radius: 14px;
+    }
+
+    .add-small {
+      border: 1px solid rgba(124,183,255,.30);
+      background: linear-gradient(135deg, rgba(124,183,255,.22), rgba(157,124,255,.12));
+      color: #edf6ff;
+      font-weight: 950;
+    }
+
+    .activity-list-card,
+    .item-detail-card,
+    .activity-editor,
+    .activity-staff-tags {
+      border: 1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.03));
+      box-shadow: var(--inner-highlight), 0 10px 24px rgba(0,0,0,.16);
+    }
+
+    .activity-list-card {
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .activity-list-time {
+      color: #f8fafc;
+      font-size: 18px;
+    }
+
+    .activity-list-duration {
+      color: #ffe27a;
+      text-shadow: 0 0 12px rgba(250,204,21,.24);
+    }
+
+    .activity-editor {
+      border-color: rgba(124,183,255,.24);
+      border-radius: 20px;
+      padding: 14px;
+      background:
+        radial-gradient(circle at 14% 0%, rgba(124,183,255,.12), transparent 36%),
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.024));
+    }
+
+    .activity-staff-tag {
+      border-color: rgba(124,183,255,.36);
+      background: linear-gradient(135deg, rgba(124,183,255,.22), rgba(157,124,255,.13));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+    }
+
+    .activity-time-picker {
+      border: 1px solid rgba(148,163,184,.20);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+        rgba(8, 12, 20, .82);
+      border-radius: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 8px 18px rgba(0,0,0,.12);
+    }
+
+    .activity-time-picker select {
+      background: rgba(255,255,255,.06);
+      border-radius: 11px;
+      font-weight: 950;
+    }
+
+    .activity-time-picker span {
+      color: #aab8cc;
+    }
+
+    .detail-header {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(124,183,255,.16), transparent 34%),
+        rgba(255,255,255,.018);
+    }
+
+    .detail-name {
+      font-size: 20px;
+      font-weight: 950;
+    }
+
+    .detail-row-value.key-value {
+      color: var(--gold);
+      text-shadow: 0 0 14px rgba(250,204,21,.30);
+    }
+
+    @media (min-width: 700px) {
+      .sheet {
+        left: 50%;
+        right: auto;
+        width: min(680px, calc(100% - 24px));
+        transform: translateX(-50%);
+      }
+
+      @keyframes sheetUp {
+        from { transform: translate(-50%, 60px); opacity: 0; }
+        to   { transform: translate(-50%, 0);    opacity: 1; }
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1121,7 +1655,7 @@
     "#4dd4ac55"
   ];
 
-  const DEFAULT_ACTIVITY_CONTENTS = ["清掃", "準備", "移動", "確認", "その他"];
+  const DEFAULT_ACTIVITY_CONTENTS = ["清掃", "ごみ捨て"];
   const DEFAULT_ACTIVITY_STAFFS = [];
 
   const DEFAULT_ITEMS = [
@@ -1140,6 +1674,7 @@
   let selectedColor = COLORS[0];
   let currentDetailItemId = "";
   let activitySelectedStaffs = [];
+  let activityEndTimeTouched = false;
 
   const calendarScroll = document.getElementById("calendarScroll");
   const calendarGrid   = document.getElementById("calendarGrid");
@@ -1181,8 +1716,21 @@
   const activityStaffTags    = document.getElementById("activityStaffTags");
   const activityDuration     = null;
 
-  [activityStartHour, activityStartMinute, activityEndHour, activityEndMinute].forEach(select => {
+  [activityStartHour, activityStartMinute].forEach(select => {
     select.addEventListener("change", () => {
+      syncActivityTimeInputsFromPicker();
+
+      if (!activityEndTimeTouched) {
+        setActivityEndTimeToStartTime();
+      }
+
+      updateActivityDuration();
+    });
+  });
+
+  [activityEndHour, activityEndMinute].forEach(select => {
+    select.addEventListener("change", () => {
+      activityEndTimeTouched = true;
       syncActivityTimeInputsFromPicker();
       updateActivityDuration();
     });
@@ -1265,7 +1813,7 @@
           items: saved.items,
           events: saved.events || {},
           activityTimes: saved.activityTimes || {},
-          activityContents: Array.isArray(saved.activityContents) ? saved.activityContents : DEFAULT_ACTIVITY_CONTENTS.slice(),
+          activityContents: normalizeSavedActivityContents(saved.activityContents),
           activityStaffs: Array.isArray(saved.activityStaffs) ? saved.activityStaffs : DEFAULT_ACTIVITY_STAFFS.slice()
         };
       }
@@ -1278,6 +1826,22 @@
       activityContents: DEFAULT_ACTIVITY_CONTENTS.slice(),
       activityStaffs: DEFAULT_ACTIVITY_STAFFS.slice()
     };
+  }
+
+  function normalizeSavedActivityContents(values) {
+    const oldDefaults = ["清掃", "準備", "移動", "確認", "その他"];
+    if (!Array.isArray(values)) return DEFAULT_ACTIVITY_CONTENTS.slice();
+
+    const normalized = [...new Set(values.map(v => String(v || "").trim()).filter(Boolean))];
+    if (sameStringList(normalized, oldDefaults)) return DEFAULT_ACTIVITY_CONTENTS.slice();
+
+    return normalized.length ? normalized : DEFAULT_ACTIVITY_CONTENTS.slice();
+  }
+
+  function sameStringList(a, b) {
+    return Array.isArray(a) && Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((v, i) => v === b[i]);
   }
 
   function saveState() {
@@ -1342,7 +1906,7 @@
         : `
           <div class="item-name">${escapeHtml(getTopDisplayName(item))}</div>
           ${item.sub ? `<div class="item-sub">${escapeHtml(item.sub)}</div>` : ""}
-          <div class="item-key">鍵：${item.key ? escapeHtml(item.key) : "─"}</div>
+          <div class="item-key">鍵：${item.key ? `<span class="item-key-value">${escapeHtml(item.key)}</span>` : "─"}</div>
         `;
 
       if (item.type !== "activity") {
@@ -1569,6 +2133,7 @@
     activityEditingId.value = editing.id;
     activityStartInput.value = editing.start || "09:00";
     activityEndInput.value = editing.end || "09:00";
+    activityEndTimeTouched = Boolean(entry && editing.end);
     syncActivityTimePickerFromInputs();
     renderActivityContentOptions(editing.content || "");
     activitySelectedStaffs = normalizeStaffList(editing.staffs ?? editing.staff);
@@ -1584,6 +2149,7 @@
   function closeActivityEntryEditor() {
     activityEditingId.value = "";
     activitySelectedStaffs = [];
+    activityEndTimeTouched = false;
     renderActivityStaffTags();
     activityEditor.classList.remove("show");
     document.getElementById("activityAddBtn").style.display = "";
@@ -1777,13 +2343,23 @@
   }
 
   function syncActivityTimePickerFromInputs() {
-    setTimePickerValue(activityStartInput.value || "09:00", activityStartHour, activityStartMinute);
-    setTimePickerValue(activityEndInput.value || "09:00", activityEndHour, activityEndMinute);
+    const startValue = activityStartInput.value || "09:00";
+    const endValue = activityEndInput.value || "09:00";
+
+    setTimePickerValue(startValue, activityStartHour, activityStartMinute);
+    setTimePickerValue(endValue, activityEndHour, activityEndMinute);
+    syncActivityTimeInputsFromPicker();
   }
 
   function syncActivityTimeInputsFromPicker() {
     activityStartInput.value = `${activityStartHour.value}:${activityStartMinute.value}`;
     activityEndInput.value = `${activityEndHour.value}:${activityEndMinute.value}`;
+  }
+
+  function setActivityEndTimeToStartTime() {
+    activityEndInput.value = activityStartInput.value || "09:00";
+    setTimePickerValue(activityEndInput.value, activityEndHour, activityEndMinute);
+    syncActivityTimeInputsFromPicker();
   }
 
   function setTimePickerValue(value, hourSelect, minuteSelect) {
@@ -1796,7 +2372,6 @@
 
     hourSelect.value = hour;
     minuteSelect.value = String(minute).padStart(2, "0");
-    syncActivityTimeInputsFromPicker();
   }
 
   function normalizeStaffList(value) {
@@ -2387,7 +2962,7 @@
         items: imported.items,
         events: imported.events || {},
         activityTimes: imported.activityTimes || {},
-        activityContents: Array.isArray(imported.activityContents) ? imported.activityContents : DEFAULT_ACTIVITY_CONTENTS.slice(),
+        activityContents: normalizeSavedActivityContents(imported.activityContents),
         activityStaffs: Array.isArray(imported.activityStaffs) ? imported.activityStaffs : DEFAULT_ACTIVITY_STAFFS.slice()
       };
       saveState();
