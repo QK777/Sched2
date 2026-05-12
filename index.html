@@ -1285,10 +1285,13 @@
     if (!el) return;
 
     let firedAt = 0;
+    let startX = 0;
+    let startY = 0;
+    let moved = false;
 
     function run(e) {
       const now = Date.now();
-      if (now - firedAt < 250) return;
+      if (now - firedAt < 280) return;
       firedAt = now;
 
       if (e) {
@@ -1299,8 +1302,27 @@
       callback();
     }
 
+    el.addEventListener("touchstart", (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      moved = false;
+    }, { passive: true });
+
+    el.addEventListener("touchmove", (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) {
+        moved = true;
+      }
+    }, { passive: true });
+
+    el.addEventListener("touchend", (e) => {
+      if (!moved) run(e);
+    }, { passive: false });
+
     el.addEventListener("click", run);
-    el.addEventListener("touchend", run, { passive: false });
   }
 
   // ── Header buttons ──────────────────────────────────────────
@@ -2448,78 +2470,111 @@
   //       pointerleave は使わない（スクロール中に誤キャンセルする）。
   //       左セルでは calendarGrid のバブリングハンドラを止める。
   function setupItemPress(el, item) {
-    let active = false;
-    let pointerId = null;
-    let startX = 0;
-    let startY = 0;
-    let startSL = 0;
-    let startST = 0;
+    let mouseDown = false;
+    let mouseX = 0;
+    let mouseY = 0;
+    let mouseSL = 0;
+    let mouseST = 0;
 
-    function cancel() {
-      active = false;
-      pointerId = null;
-      el.classList.remove("long-pressing");
-      try { el.releasePointerCapture && el.releasePointerCapture(pointerId); } catch {}
+    let touchActive = false;
+    let touchMoved = false;
+    let touchX = 0;
+    let touchY = 0;
+    let touchSL = 0;
+    let touchST = 0;
+    let lastOpenAt = 0;
+
+    function openOnce(e) {
+      const now = Date.now();
+      if (now - lastOpenAt < 280) return;
+      lastOpenAt = now;
+
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      openItemDetailSheet(item);
     }
 
+    // PC mouse
     el.addEventListener("pointerdown", (e) => {
-      if (e.pointerType === "mouse" && e.button !== 0) return;
-      if (active) return;
+      if (e.pointerType !== "mouse") return;
+      if (e.button !== 0) return;
 
+      mouseDown = true;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      mouseSL = calendarScroll.scrollLeft;
+      mouseST = calendarScroll.scrollTop;
       e.stopPropagation();
-
-      active = true;
-      pointerId = e.pointerId;
-      startX = e.clientX;
-      startY = e.clientY;
-      startSL = calendarScroll.scrollLeft;
-      startST = calendarScroll.scrollTop;
-
-      try { el.setPointerCapture(e.pointerId); } catch {}
-    });
-
-    el.addEventListener("pointermove", (e) => {
-      if (!active || e.pointerId !== pointerId) return;
-
-      const moved =
-        Math.abs(e.clientX - startX) > 10 ||
-        Math.abs(e.clientY - startY) > 10 ||
-        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
-        Math.abs(calendarScroll.scrollTop - startST) > 10;
-
-      if (moved) cancel();
     });
 
     el.addEventListener("pointerup", (e) => {
-      if (!active || e.pointerId !== pointerId) return;
+      if (e.pointerType !== "mouse" || !mouseDown) return;
 
-      const scrolled =
-        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
-        Math.abs(calendarScroll.scrollTop - startST) > 10;
+      const moved =
+        Math.abs(e.clientX - mouseX) > 10 ||
+        Math.abs(e.clientY - mouseY) > 10 ||
+        Math.abs(calendarScroll.scrollLeft - mouseSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - mouseST) > 10;
 
-      cancel();
+      mouseDown = false;
 
-      if (!scrolled) {
-        e.stopPropagation();
-        openItemDetailSheet(item);
+      if (!moved) openOnce(e);
+    });
+
+    el.addEventListener("pointercancel", () => {
+      mouseDown = false;
+    });
+
+    // Android / iPhone touch
+    el.addEventListener("touchstart", (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      touchActive = true;
+      touchMoved = false;
+      touchX = t.clientX;
+      touchY = t.clientY;
+      touchSL = calendarScroll.scrollLeft;
+      touchST = calendarScroll.scrollTop;
+      e.stopPropagation();
+    }, { passive: true });
+
+    el.addEventListener("touchmove", (e) => {
+      if (!touchActive || !e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      if (
+        Math.abs(t.clientX - touchX) > 10 ||
+        Math.abs(t.clientY - touchY) > 10 ||
+        Math.abs(calendarScroll.scrollLeft - touchSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - touchST) > 10
+      ) {
+        touchMoved = true;
       }
-    });
+    }, { passive: true });
 
-    el.addEventListener("pointercancel", cancel);
-
-    el.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openItemDetailSheet(item);
-    });
-
-    // Android Chrome等でpointerup後のclickが潰れる場合の保険
     el.addEventListener("touchend", (e) => {
-      if (active) return;
-      e.preventDefault();
-      e.stopPropagation();
-      openItemDetailSheet(item);
+      if (!touchActive) return;
+
+      const moved =
+        touchMoved ||
+        Math.abs(calendarScroll.scrollLeft - touchSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - touchST) > 10;
+
+      touchActive = false;
+
+      if (!moved) openOnce(e);
     }, { passive: false });
+
+    el.addEventListener("touchcancel", () => {
+      touchActive = false;
+    }, { passive: true });
+
+    // 最後の保険
+    el.addEventListener("click", (e) => openOnce(e));
   }
 
   // ── Colour palette / people ──────────────────────────────────
@@ -2562,18 +2617,29 @@
 
   // ── Cell tap handler (grid cells only) ───────────────────────
   function setupCalendarCellPress(cell, dateStr, itemId) {
-    let active = false;
-    let pointerId = null;
-    let startX = 0;
-    let startY = 0;
-    let startSL = 0;
-    let startST = 0;
+    let mouseDown = false;
+    let mouseX = 0;
+    let mouseY = 0;
+    let mouseSL = 0;
+    let mouseST = 0;
+
+    let touchActive = false;
+    let touchMoved = false;
+    let touchX = 0;
+    let touchY = 0;
+    let touchSL = 0;
+    let touchST = 0;
     let openedAt = 0;
 
-    function open() {
+    function openOnce(e) {
       const now = Date.now();
-      if (now - openedAt < 250) return;
+      if (now - openedAt < 280) return;
       openedAt = now;
+
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
 
       const item = state.items.find(x => x.id === itemId);
       if (item?.type === "activity") {
@@ -2583,63 +2649,84 @@
       }
     }
 
-    function cancel() {
-      active = false;
-      pointerId = null;
-      try { cell.releasePointerCapture && cell.releasePointerCapture(pointerId); } catch {}
-    }
-
+    // PC mouse
     cell.addEventListener("pointerdown", (e) => {
-      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.pointerType !== "mouse") return;
+      if (e.button !== 0) return;
 
-      active = true;
-      pointerId = e.pointerId;
-      startX = e.clientX;
-      startY = e.clientY;
-      startSL = calendarScroll.scrollLeft;
-      startST = calendarScroll.scrollTop;
-
-      try { cell.setPointerCapture(e.pointerId); } catch {}
-    });
-
-    cell.addEventListener("pointermove", (e) => {
-      if (!active || e.pointerId !== pointerId) return;
-
-      const moved =
-        Math.abs(e.clientX - startX) > 10 ||
-        Math.abs(e.clientY - startY) > 10 ||
-        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
-        Math.abs(calendarScroll.scrollTop - startST) > 10;
-
-      if (moved) cancel();
+      mouseDown = true;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      mouseSL = calendarScroll.scrollLeft;
+      mouseST = calendarScroll.scrollTop;
     });
 
     cell.addEventListener("pointerup", (e) => {
-      if (!active || e.pointerId !== pointerId) return;
+      if (e.pointerType !== "mouse" || !mouseDown) return;
 
       const moved =
-        Math.abs(e.clientX - startX) > 10 ||
-        Math.abs(e.clientY - startY) > 10 ||
-        Math.abs(calendarScroll.scrollLeft - startSL) > 10 ||
-        Math.abs(calendarScroll.scrollTop - startST) > 10;
+        Math.abs(e.clientX - mouseX) > 10 ||
+        Math.abs(e.clientY - mouseY) > 10 ||
+        Math.abs(calendarScroll.scrollLeft - mouseSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - mouseST) > 10;
 
-      cancel();
+      mouseDown = false;
 
-      if (!moved) {
-        e.preventDefault();
-        e.stopPropagation();
-        open();
-      }
+      if (!moved) openOnce(e);
     });
 
-    cell.addEventListener("pointercancel", cancel);
+    cell.addEventListener("pointercancel", () => {
+      mouseDown = false;
+    });
 
-    // pointer系が効かない環境の保険
+    // Android / iPhone touch
+    cell.addEventListener("touchstart", (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      touchActive = true;
+      touchMoved = false;
+      touchX = t.clientX;
+      touchY = t.clientY;
+      touchSL = calendarScroll.scrollLeft;
+      touchST = calendarScroll.scrollTop;
+    }, { passive: true });
+
+    cell.addEventListener("touchmove", (e) => {
+      if (!touchActive || !e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      if (
+        Math.abs(t.clientX - touchX) > 10 ||
+        Math.abs(t.clientY - touchY) > 10 ||
+        Math.abs(calendarScroll.scrollLeft - touchSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - touchST) > 10
+      ) {
+        touchMoved = true;
+      }
+    }, { passive: true });
+
+    cell.addEventListener("touchend", (e) => {
+      if (!touchActive) return;
+
+      const moved =
+        touchMoved ||
+        Math.abs(calendarScroll.scrollLeft - touchSL) > 10 ||
+        Math.abs(calendarScroll.scrollTop - touchST) > 10;
+
+      touchActive = false;
+
+      if (!moved) openOnce(e);
+    }, { passive: false });
+
+    cell.addEventListener("touchcancel", () => {
+      touchActive = false;
+    }, { passive: true });
+
+    // 最後の保険
     cell.addEventListener("click", (e) => {
       if (calendarScroll.dataset.suppressClick === "1") return;
-      e.preventDefault();
-      e.stopPropagation();
-      open();
+      openOnce(e);
     });
   }
 
