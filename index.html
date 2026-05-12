@@ -43,11 +43,17 @@
     button, input, select, textarea {
       font-family: inherit;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
       touch-action: manipulation;
     }
 
     input, select, textarea {
       touch-action: auto;
+      pointer-events: auto;
+      user-select: auto;
+      -webkit-user-select: auto;
     }
 
     button {
@@ -456,6 +462,7 @@
     }
 
     .sheet {
+      touch-action: auto;
       position: absolute;
       left: 0;
       right: 0;
@@ -1294,27 +1301,6 @@
 
     el.addEventListener("click", run);
     el.addEventListener("touchend", run, { passive: false });
-  }
-
-  function setupSheetInputGuards() {
-    document.querySelectorAll(".sheet input, .sheet select, .sheet textarea, .sheet button").forEach(el => {
-      ["pointerdown", "touchstart", "click"].forEach(type => {
-        el.addEventListener(type, (e) => {
-          // select/input のネイティブ操作を邪魔しないよう preventDefault はしない
-          e.stopPropagation();
-        }, { passive: true });
-      });
-    });
-
-    document.querySelectorAll(".activity-time-picker select, #activityContentInput, #activityStaffInput").forEach(el => {
-      el.addEventListener("touchend", (e) => {
-        e.stopPropagation();
-      }, { passive: true });
-
-      el.addEventListener("pointerup", (e) => {
-        e.stopPropagation();
-      });
-    });
   }
 
   // ── Header buttons ──────────────────────────────────────────
@@ -2909,7 +2895,6 @@
 
   // ── Boot ─────────────────────────────────────────────────────
   setupActivityTimePickers();
-  setupSheetInputGuards();
   setupCellTapHandler();
   setupMobileScrollGuard();
   setupCalendarDragScroll();
