@@ -203,6 +203,7 @@
     .date-head.sat .date-week { color: #8bbcff; }
 
     .left-cell {
+      touch-action: manipulation;
       position: sticky;
       left: 0;
       z-index: 15;
@@ -730,6 +731,9 @@
     }
 
     .activity-add-button {
+      touch-action: manipulation;
+      position: relative;
+      z-index: 5;
       width: 46px;
       height: 46px;
       min-width: 46px;
@@ -1265,6 +1269,28 @@
     }
   });
 
+  function safeTap(el, callback) {
+    if (!el) return;
+
+    let firedAt = 0;
+
+    function run(e) {
+      const now = Date.now();
+      if (now - firedAt < 250) return;
+      firedAt = now;
+
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      callback();
+    }
+
+    el.addEventListener("click", run);
+    el.addEventListener("touchend", run, { passive: false });
+  }
+
   // ── Header buttons ──────────────────────────────────────────
   document.getElementById("prevMonthBtn").onclick = () => {
     current.setMonth(current.getMonth() - 1);
@@ -1469,11 +1495,11 @@
   });
 
   // ── Activity Sheet buttons ───────────────────────────────────
-  document.getElementById("activityCloseBtn").onclick = closeActivitySheet;
-  document.getElementById("activityAddBtn").onclick = () => openActivityEntryEditor();
-  document.getElementById("activityBackBtn").onclick = closeActivityEntryEditor;
-  document.getElementById("activityEntrySaveBtn").onclick = saveActivityTimeFromSheet;
-  document.getElementById("activityEntryDeleteBtn").onclick = deleteActivityEntryFromEditor;
+  safeTap(document.getElementById("activityCloseBtn"), closeActivitySheet);
+  safeTap(document.getElementById("activityAddBtn"), () => openActivityEntryEditor());
+  safeTap(document.getElementById("activityBackBtn"), closeActivityEntryEditor);
+  safeTap(document.getElementById("activityEntrySaveBtn"), saveActivityTimeFromSheet);
+  safeTap(document.getElementById("activityEntryDeleteBtn"), deleteActivityEntryFromEditor);
 
   setupActivityOptionButton("activityContentAddBtn", "activityContents", "内容を追加", activityContentInput, renderActivityContentOptions);
   setupActivityOptionButton("activityStaffAddBtn", "activityStaffs", "担当を追加", activityStaffInput, renderActivityStaffOptions);
@@ -1535,11 +1561,7 @@
       <button class="corner-add" id="cornerAddItemBtn" type="button" title="項目追加" aria-label="項目追加">＋</button>
     `;
     calendarGrid.appendChild(corner);
-    corner.querySelector("#cornerAddItemBtn").onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openItemSheet();
-    };
+    safeTap(corner.querySelector("#cornerAddItemBtn"), openItemSheet);
 
     // Date headers
     for (const date of days) {
@@ -2425,7 +2447,7 @@
     }
 
     el.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
       if (active) return;
 
       e.stopPropagation();
@@ -2470,8 +2492,18 @@
     el.addEventListener("pointercancel", cancel);
 
     el.addEventListener("click", (e) => {
+      e.preventDefault();
       e.stopPropagation();
+      openItemDetailSheet(item);
     });
+
+    // Android Chrome等でpointerup後のclickが潰れる場合の保険
+    el.addEventListener("touchend", (e) => {
+      if (active) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openItemDetailSheet(item);
+    }, { passive: false });
   }
 
   // ── Colour palette / people ──────────────────────────────────
@@ -2542,7 +2574,7 @@
     }
 
     cell.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
 
       active = true;
       pointerId = e.pointerId;
@@ -2674,7 +2706,7 @@
     calendarScroll.addEventListener("pointerdown", (e) => {
       if (e.pointerType !== "mouse") return;
       if (e.target.closest("button, input, select, textarea")) return;
-      if (e.button !== 0) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
       cancelMomentum();
       isDown = true;
       moved  = false;
