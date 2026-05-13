@@ -504,12 +504,19 @@
 
     .cal-cell.stay-chain .mini-content,
     .cal-cell.stay-chain .mini-line {
-      visibility: hidden;
+      visibility: visible;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition:
+        opacity 0.22s ease,
+        transform 0.22s ease;
+      will-change: opacity, transform;
     }
 
     .cal-cell.stay-chain.stay-text-active .mini-content,
     .cal-cell.stay-chain.stay-text-active .mini-line {
-      visibility: visible;
+      opacity: 1;
+      transform: translateX(0);
     }
 
     .cal-cell.stay-chain.stay-text-active .mini-content {
@@ -807,13 +814,40 @@
 
     .activity-list-card {
       width: 100%;
-      text-align: left;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 36px;
+      gap: 6px;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .activity-list-main {
+      min-width: 0;
+      text-align: left;
+      background: transparent;
+      border-radius: 0;
       padding: 10px;
       display: grid;
       gap: 4px;
+      color: var(--text);
+    }
+
+    .activity-list-delete {
+      width: 36px;
+      min-width: 36px;
+      height: 100%;
+      border-radius: 0;
+      background: rgba(255,91,91,0.14);
+      color: #ffb4b9;
+      font-size: 20px;
+      font-weight: 900;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-left: 1px solid rgba(255,255,255,0.08);
     }
 
     .activity-list-time {
@@ -1060,11 +1094,13 @@
       }
     }
 
-    /* 活動時間の時刻選択だけに効かせる */
+    /* 活動時間の時刻入力だけに効かせる */
     .activity-time-row {
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
       align-items: end;
+      width: 100%;
     }
 
     .activity-time-field {
@@ -1080,69 +1116,40 @@
       text-align: center;
     }
 
-    .activity-time-picker {
-      width: 100%;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      gap: 6px;
-      align-items: center;
-      border: 1px solid var(--border);
-      background: #10131b;
-      border-radius: 12px;
-      padding: 8px;
-    }
-
-    .activity-time-picker span {
-      color: var(--muted);
-      font-weight: 900;
-      font-size: 17px;
-      line-height: 1;
-      text-align: center;
-      min-width: 8px;
-    }
-
-    .activity-time-picker select {
+    .activity-time-native {
       width: 100%;
       min-width: 0;
-      height: 42px;
-      border: 0;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      font-size: 17px;
-      font-weight: 850;
+      max-width: 100%;
+      height: 44px;
+      padding: 8px 4px;
+      font-size: 15px;
       text-align: center;
-      text-align-last: center;
-      padding: 0 2px;
+      box-sizing: border-box;
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 390px) {
       .activity-time-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 6px;
       }
 
-      .activity-time-picker {
-        grid-template-columns: 1fr auto 1fr;
-        gap: 8px;
-        padding: 8px;
-      }
-
-      .activity-time-picker select {
-        height: 44px;
-        font-size: 18px;
+      .activity-time-native {
+        height: 42px;
+        font-size: 14px;
+        padding-left: 2px;
+        padding-right: 2px;
       }
     }
 
     @media (max-width: 350px) {
-      .activity-time-picker {
-        gap: 6px;
-        padding: 7px;
+      .activity-time-row {
+        gap: 5px;
       }
 
-      .activity-time-picker select {
-        height: 42px;
-        font-size: 17px;
+      .activity-time-native {
+        height: 40px;
+        font-size: 13px;
+        padding-left: 1px;
+        padding-right: 1px;
       }
     }
 
@@ -1277,21 +1284,11 @@
       <div class="time-row activity-time-row">
         <div class="activity-time-field">
           <label>開始時間</label>
-          <input type="hidden" id="activityStartInput">
-          <div class="activity-time-picker">
-            <select id="activityStartHour" aria-label="開始 時"></select>
-            <span>:</span>
-            <select id="activityStartMinute" aria-label="開始 分"></select>
-          </div>
+          <input type="time" id="activityStartInput" class="activity-time-native">
         </div>
         <div class="activity-time-field">
           <label>終了時間</label>
-          <input type="hidden" id="activityEndInput">
-          <div class="activity-time-picker">
-            <select id="activityEndHour" aria-label="終了 時"></select>
-            <span>:</span>
-            <select id="activityEndMinute" aria-label="終了 分"></select>
-          </div>
+          <input type="time" id="activityEndInput" class="activity-time-native">
         </div>
       </div>
 
@@ -1405,21 +1402,21 @@
   const activityEditor       = document.getElementById("activityEditor");
   const activityStartInput   = document.getElementById("activityStartInput");
   const activityEndInput     = document.getElementById("activityEndInput");
-  const activityStartHour    = document.getElementById("activityStartHour");
-  const activityStartMinute  = document.getElementById("activityStartMinute");
-  const activityEndHour      = document.getElementById("activityEndHour");
-  const activityEndMinute    = document.getElementById("activityEndMinute");
   const activityContentInput = document.getElementById("activityContentInput");
   const activityStaffInput   = document.getElementById("activityStaffInput");
   const activityStaffTags    = document.getElementById("activityStaffTags");
   const activityDuration     = null;
 
-  [activityStartHour, activityStartMinute, activityEndHour, activityEndMinute].forEach(select => {
-    select.addEventListener("change", () => {
-      syncActivityTimeInputsFromPicker();
-      updateActivityDuration();
-    });
+  activityStartInput.addEventListener("focus", () => {
+    if (!activityStartInput.value) activityStartInput.value = "09:00";
   });
+
+  activityEndInput.addEventListener("focus", () => {
+    if (!activityEndInput.value) activityEndInput.value = "09:00";
+  });
+
+  activityStartInput.addEventListener("input", updateActivityDuration);
+  activityEndInput.addEventListener("input", updateActivityDuration);
 
   activityStaffInput.addEventListener("change", () => {
     if (activityStaffInput.value) {
@@ -1562,12 +1559,11 @@
     const cells = [...calendarGrid.querySelectorAll(".cal-cell.stay-chain")];
     if (!cells.length) return;
 
-    cells.forEach(cell => cell.classList.remove("stay-text-active"));
-
     const leftWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--leftw")) || 0;
     const visibleLeft = calendarScroll.scrollLeft + leftWidth;
     const visibleRight = calendarScroll.scrollLeft + calendarScroll.clientWidth;
     const targetX = visibleLeft + Math.max(0, (visibleRight - visibleLeft) * 0.35);
+    const switchThreshold = Math.max(18, (parseInt(getComputedStyle(document.documentElement).getPropertyValue("--cellw")) || 96) * 0.28);
 
     const groups = new Map();
     cells.forEach(cell => {
@@ -1600,7 +1596,24 @@
         }
       });
 
-      if (best) best.classList.add("stay-text-active");
+      if (!best) return;
+
+      const current = groupCells.find(cell => cell.classList.contains("stay-text-active"));
+
+      // すでに表示中のセルがまだ見えていて、候補との差が小さい場合は切替えない。
+      // これでスクロール中の文字の飛びを抑える。
+      if (current && current !== best) {
+        const currentCenter = current.offsetLeft + current.offsetWidth / 2;
+        const currentDistance = Math.abs(currentCenter - targetX);
+        const currentVisible = current.offsetLeft + current.offsetWidth > visibleLeft && current.offsetLeft < visibleRight;
+
+        if (currentVisible && currentDistance <= bestDistance + switchThreshold) {
+          return;
+        }
+      }
+
+      groupCells.forEach(cell => cell.classList.remove("stay-text-active"));
+      best.classList.add("stay-text-active");
     });
   }
 
@@ -1931,12 +1944,11 @@
     const cells = [...calendarGrid.querySelectorAll(".cal-cell.stay-chain")];
     if (!cells.length) return;
 
-    cells.forEach(cell => cell.classList.remove("stay-text-active"));
-
     const leftWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--leftw")) || 0;
     const visibleLeft = calendarScroll.scrollLeft + leftWidth;
     const visibleRight = calendarScroll.scrollLeft + calendarScroll.clientWidth;
     const targetX = visibleLeft + Math.max(0, (visibleRight - visibleLeft) * 0.35);
+    const switchThreshold = Math.max(18, (parseInt(getComputedStyle(document.documentElement).getPropertyValue("--cellw")) || 96) * 0.28);
 
     const groups = new Map();
     cells.forEach(cell => {
@@ -1969,7 +1981,24 @@
         }
       });
 
-      if (best) best.classList.add("stay-text-active");
+      if (!best) return;
+
+      const current = groupCells.find(cell => cell.classList.contains("stay-text-active"));
+
+      // すでに表示中のセルがまだ見えていて、候補との差が小さい場合は切替えない。
+      // これでスクロール中の文字の飛びを抑える。
+      if (current && current !== best) {
+        const currentCenter = current.offsetLeft + current.offsetWidth / 2;
+        const currentDistance = Math.abs(currentCenter - targetX);
+        const currentVisible = current.offsetLeft + current.offsetWidth > visibleLeft && current.offsetLeft < visibleRight;
+
+        if (currentVisible && currentDistance <= bestDistance + switchThreshold) {
+          return;
+        }
+      }
+
+      groupCells.forEach(cell => cell.classList.remove("stay-text-active"));
+      best.classList.add("stay-text-active");
     });
   }
 
@@ -2145,18 +2174,29 @@
       const duration = formatDuration(entry.start, entry.end);
       const meta = [entry.content, formatStaffs(entry)].filter(Boolean).join(" / ");
       return `
-        <button class="activity-list-card" type="button" data-id="${escapeAttr(entry.id)}">
-          <div class="activity-list-time">${escapeHtml(entry.start || "--:--")}～${escapeHtml(entry.end || "--:--")}</div>
-          ${meta ? `<div class="activity-list-meta">${escapeHtml(meta)}</div>` : ""}
-          ${duration ? `<div class="activity-list-duration">${escapeHtml(duration)}</div>` : ""}
-        </button>
+        <div class="activity-list-card" data-id="${escapeAttr(entry.id)}">
+          <button class="activity-list-main" type="button" data-id="${escapeAttr(entry.id)}">
+            <div class="activity-list-time">${escapeHtml(entry.start || "--:--")}～${escapeHtml(entry.end || "--:--")}</div>
+            ${meta ? `<div class="activity-list-meta">${escapeHtml(meta)}</div>` : ""}
+            ${duration ? `<div class="activity-list-duration">${escapeHtml(duration)}</div>` : ""}
+          </button>
+          <button class="activity-list-delete" type="button" data-id="${escapeAttr(entry.id)}" aria-label="削除">×</button>
+        </div>
       `;
     }).join("");
 
-    activityList.querySelectorAll(".activity-list-card").forEach(btn => {
+    activityList.querySelectorAll(".activity-list-main").forEach(btn => {
       btn.onclick = () => {
         const entry = entries.find(x => x.id === btn.dataset.id);
         if (entry) openActivityEntryEditor(entry);
+      };
+    });
+
+    activityList.querySelectorAll(".activity-list-delete").forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteActivityEntryById(btn.dataset.id);
       };
     });
   }
@@ -2174,7 +2214,6 @@
     activityEditingId.value = editing.id;
     activityStartInput.value = editing.start || "09:00";
     activityEndInput.value = editing.end || "09:00";
-    syncActivityTimePickerFromInputs();
     renderActivityContentOptions(editing.content || "");
     activitySelectedStaffs = normalizeStaffList(editing.staffs ?? editing.staff);
     renderActivityStaffOptions("");
@@ -2227,9 +2266,8 @@
     renderCalendar(false);
   }
 
-  function deleteActivityEntryFromEditor() {
+  function deleteActivityEntryById(id) {
     const dateStr = activityDateInput.value;
-    const id = activityEditingId.value;
     if (!dateStr || !id) return;
 
     if (!confirm("この活動時間を削除しますか？")) return;
@@ -2240,6 +2278,10 @@
     closeActivityEntryEditor();
     renderActivityEntryList();
     renderCalendar(false);
+  }
+
+  function deleteActivityEntryFromEditor() {
+    deleteActivityEntryById(activityEditingId.value);
   }
 
   function deleteActivityTimeFromSheet() {
@@ -2362,46 +2404,6 @@
     saveState();
     renderFn(newValue);
     selectEl.value = newValue;
-  }
-
-  function setupActivityTimePickers() {
-    const hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
-    const minuteOptions = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
-
-    [activityStartHour, activityEndHour].forEach(select => {
-      select.innerHTML = hourOptions.map(v => `<option value="${v}">${v}</option>`).join("");
-    });
-
-    [activityStartMinute, activityEndMinute].forEach(select => {
-      select.innerHTML = minuteOptions.map(v => `<option value="${v}">${v}</option>`).join("");
-    });
-
-    activityStartInput.value = activityStartInput.value || "09:00";
-    activityEndInput.value = activityEndInput.value || "09:00";
-    syncActivityTimePickerFromInputs();
-  }
-
-  function syncActivityTimePickerFromInputs() {
-    setTimePickerValue(activityStartInput.value || "09:00", activityStartHour, activityStartMinute);
-    setTimePickerValue(activityEndInput.value || "09:00", activityEndHour, activityEndMinute);
-  }
-
-  function syncActivityTimeInputsFromPicker() {
-    activityStartInput.value = `${activityStartHour.value}:${activityStartMinute.value}`;
-    activityEndInput.value = `${activityEndHour.value}:${activityEndMinute.value}`;
-  }
-
-  function setTimePickerValue(value, hourSelect, minuteSelect) {
-    const match = String(value || "09:00").match(/^(\d{1,2}):(\d{2})$/);
-    const hour = match ? String(Number(match[1])).padStart(2, "0") : "09";
-    let minute = match ? Number(match[2]) : 0;
-
-    minute = Math.round(minute / 5) * 5;
-    if (minute >= 60) minute = 55;
-
-    hourSelect.value = hour;
-    minuteSelect.value = String(minute).padStart(2, "0");
-    syncActivityTimeInputsFromPicker();
   }
 
   function normalizeStaffList(value) {
@@ -3123,12 +3125,16 @@
 
   function escapeAttr(str) { return escapeHtml(str).replace(/`/g, "&#096;"); }
 
+  let stayTextRaf = 0;
   calendarScroll.addEventListener("scroll", () => {
-    requestAnimationFrame(updateStayTextPositions);
+    if (stayTextRaf) cancelAnimationFrame(stayTextRaf);
+    stayTextRaf = requestAnimationFrame(() => {
+      stayTextRaf = 0;
+      updateStayTextPositions();
+    });
   }, { passive: true });
 
   // ── Boot ─────────────────────────────────────────────────────
-  setupActivityTimePickers();
   setupCellTapHandler();
   setupMobileScrollGuard();
   setupCalendarDragScroll();
