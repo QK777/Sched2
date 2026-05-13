@@ -439,6 +439,14 @@
       border-right: 0;
     }
 
+    .mini-card.stay-start-card::before {
+      border-top-right-radius: 0;
+    }
+
+    .mini-card.stay-start-card::after {
+      right: 0;
+    }
+
     .mini-card.stay-middle-card {
       border-radius: 0;
       border-left: 0;
@@ -448,14 +456,35 @@
         inset 0 -1px 0 rgba(0,0,0,0.14);
     }
 
+    .mini-card.stay-middle-card::before {
+      border-radius: 0;
+    }
+
+    .mini-card.stay-middle-card::after {
+      left: 0;
+      right: 0;
+    }
+
     .mini-card.stay-end-card {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
       border-left: 0;
     }
 
+    .mini-card.stay-end-card::before {
+      border-top-left-radius: 0;
+    }
+
+    .mini-card.stay-end-card::after {
+      left: 0;
+    }
+
     .mini-card.stay-single-card {
-      border-radius: 9px;
+      border-radius: 11px;
+    }
+
+    .mini-card.stay-single-card::before {
+      border-radius: 10px 10px 7px 7px;
     }
 
     .cal-cell.stay-chain .mini-content,
