@@ -155,8 +155,8 @@
       z-index: 25;
       touch-action: pan-y;
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035)),
-        rgba(17, 20, 29, 0.72);
+        linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.025)),
+        rgba(17, 20, 29, 0.54);
       backdrop-filter: blur(14px) saturate(1.25);
       -webkit-backdrop-filter: blur(14px) saturate(1.25);
       box-shadow:
@@ -230,8 +230,8 @@
       z-index: 15;
       cursor: pointer;
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025)),
-        rgba(17, 20, 29, 0.70);
+        linear-gradient(135deg, rgba(255,255,255,0.11), rgba(255,255,255,0.020)),
+        rgba(17, 20, 29, 0.52);
       backdrop-filter: blur(14px) saturate(1.2);
       -webkit-backdrop-filter: blur(14px) saturate(1.2);
       box-shadow:
@@ -249,8 +249,8 @@
 
     .left-cell:not(.activity):hover {
       background:
-        linear-gradient(135deg, rgba(106,166,255,0.13), rgba(255,255,255,0.035)),
-        rgba(22, 26, 38, 0.76);
+        linear-gradient(135deg, rgba(106,166,255,0.16), rgba(255,255,255,0.025)),
+        rgba(22, 26, 38, 0.58);
       box-shadow:
         inset -1px 0 0 rgba(106,166,255,0.18),
         inset 0 1px 0 rgba(255,255,255,0.08);
@@ -258,8 +258,8 @@
 
     .left-cell.activity {
       background:
-        linear-gradient(135deg, rgba(250,204,21,0.13), rgba(255,255,255,0.035)),
-        rgba(24, 24, 28, 0.74);
+        linear-gradient(135deg, rgba(250,204,21,0.16), rgba(255,255,255,0.025)),
+        rgba(24, 24, 28, 0.56);
       cursor: default;
     }
 
@@ -269,7 +269,7 @@
     }
 
     .item-name {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 900;
       line-height: 1.25;
       overflow-wrap: anywhere;
@@ -278,10 +278,12 @@
     }
 
     .item-sub {
-      font-size: 10px;
-      color: rgba(209,213,219,0.88);
+      font-size: 11px;
+      color: rgba(255,255,255,0.94);
+      font-weight: 500;
       line-height: 1.25;
       overflow-wrap: anywhere;
+      text-shadow: 0 1px 7px rgba(0,0,0,0.32);
     }
 
     .item-address {
@@ -295,7 +297,7 @@
       width: fit-content;
       max-width: 100%;
       font-size: 10px;
-      color: rgba(243,244,246,0.68);
+      color: rgba(243,244,246,0.72);
       line-height: 1.15;
       font-weight: 750;
       padding: 2px 6px;
@@ -306,12 +308,14 @@
 
     .item-key-value {
       color: #facc15;
-      font-size: 12px;
+      font-size: 13px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       font-weight: 950;
       letter-spacing: 0.05em;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 10px rgba(250,204,21,0.24);
+      text-shadow:
+        0 0 10px rgba(250,204,21,0.34),
+        0 1px 6px rgba(0,0,0,0.35);
     }
 
     .cal-cell {
@@ -337,40 +341,78 @@
       pointer-events: none;
       width: 100%;
       height: 100%;
-      border-radius: 9px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: var(--card-color, rgba(106,166,255,.28));
-      padding: 3px;
+      border-radius: 11px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background:
+        radial-gradient(circle at 24% 16%, rgba(255,255,255,0.20), transparent 32%),
+        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)),
+        var(--card-color, rgba(106,166,255,.28));
+      padding: 4px;
       overflow: hidden;
       color: #f8fafc;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+      box-shadow:
+        0 8px 18px rgba(0,0,0,0.24),
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 -1px 0 rgba(0,0,0,0.16);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
       gap: 3px;
+      position: relative;
+    }
+
+    .mini-card::before {
+      content: "";
+      position: absolute;
+      inset: 1px 1px auto 1px;
+      height: 36%;
+      border-radius: 10px 10px 7px 7px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.20), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .mini-card::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 5px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      pointer-events: none;
     }
 
     .mini-content {
-      font-size: 17px;
+      position: relative;
+      z-index: 1;
+      font-size: 18px;
       font-weight: 950;
       line-height: 1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
     }
 
     .mini-line {
-      width: 100%;
-      color: rgba(255,255,255,.9);
+      position: relative;
+      z-index: 1;
+      width: fit-content;
+      max-width: 100%;
+      color: rgba(255,255,255,.92);
       font-size: 11px;
-      font-weight: 750;
+      font-weight: 800;
       line-height: 1.15;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     .mini-placeholder {
@@ -401,7 +443,9 @@
       border-radius: 0;
       border-left: 0;
       border-right: 0;
-      box-shadow: none;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        inset 0 -1px 0 rgba(0,0,0,0.14);
     }
 
     .mini-card.stay-end-card {
@@ -436,8 +480,11 @@
       pointer-events: none;
       width: 100%;
       height: 100%;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+        rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.08);
       display: grid;
       place-items: center;
       padding: 4px;
@@ -447,12 +494,31 @@
       text-align: center;
       white-space: nowrap;
       line-height: 1.12;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
     }
 
     .activity-card.has-time {
       color: var(--text);
-      background: rgba(250, 204, 21, 0.16);
-      border: 1px solid rgba(250, 204, 21, 0.25);
+      background:
+        radial-gradient(circle at 25% 10%, rgba(255,255,255,0.20), transparent 32%),
+        linear-gradient(135deg, rgba(250,204,21,0.22), rgba(250,204,21,0.08)),
+        rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.32);
+      box-shadow:
+        0 8px 18px rgba(0,0,0,0.22),
+        inset 0 1px 0 rgba(255,255,255,0.16);
+    }
+
+    .activity-card.has-time::before {
+      content: "";
+      position: absolute;
+      inset: 1px 1px auto 1px;
+      height: 36%;
+      border-radius: 9px 9px 6px 6px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.18), transparent);
+      pointer-events: none;
     }
 
     .activity-tilde {
@@ -469,11 +535,16 @@
     }
 
     .activity-total-time {
+      position: relative;
+      z-index: 1;
       color: #facc15;
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 950;
       line-height: 1;
       letter-spacing: 0.02em;
+      text-shadow:
+        0 0 10px rgba(250,204,21,0.28),
+        0 2px 8px rgba(0,0,0,0.38);
     }
 
     /* ── Sheets ── */
@@ -1660,7 +1731,7 @@
         : `
           <div class="item-name">${escapeHtml(getTopDisplayName(item))}</div>
           ${item.sub ? `<div class="item-sub">${escapeHtml(item.sub)}</div>` : ""}
-          <div class="item-key">鍵：${item.key ? escapeHtml(item.key) : "─"}</div>
+          <div class="item-key">鍵：<span class="item-key-value">${item.key ? escapeHtml(item.key) : "─"}</span></div>
         `;
 
       if (item.type !== "activity") {
