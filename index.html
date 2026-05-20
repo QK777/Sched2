@@ -360,7 +360,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      gap: 3px;
+      gap: 2px;
       position: relative;
     }
 
@@ -389,6 +389,20 @@
       text-overflow: ellipsis;
       max-width: 100%;
       text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+
+    .mini-stay-days {
+      position: relative;
+      z-index: 1;
+      color: rgba(255,255,255,0.90);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.30);
     }
 
     .mini-line {
@@ -503,6 +517,7 @@
     }
 
     .cal-cell.stay-chain .mini-content,
+    .cal-cell.stay-chain .mini-stay-days,
     .cal-cell.stay-chain .mini-line {
       visibility: visible;
       opacity: 0;
@@ -514,6 +529,7 @@
     }
 
     .cal-cell.stay-chain.stay-text-active .mini-content,
+    .cal-cell.stay-chain.stay-text-active .mini-stay-days,
     .cal-cell.stay-chain.stay-text-active .mini-line {
       opacity: 1;
       transform: translateX(0);
@@ -521,6 +537,10 @@
 
     .cal-cell.stay-chain.stay-text-active .mini-content {
       font-size: 16px;
+    }
+
+    .cal-cell.stay-chain.stay-text-active .mini-stay-days {
+      font-size: 11px;
     }
 
     .cal-cell.stay-chain.stay-text-active .mini-line {
@@ -1532,6 +1552,7 @@
       state.events[eventKey(startDateStr, itemId)] = {
         ...baseEv,
         date: startDateStr,
+        stayStartDate: "",
         stayEndDate: ""
       };
       return;
@@ -1542,33 +1563,53 @@
       state.events[eventKey(dateStr, itemId)] = {
         ...baseEv,
         date: dateStr,
+        stayStartDate: startDateStr,
         stayEndDate: endDateStr
       };
     }
   }
 
-  function formatPeopleWithStay(ev) {
-    const people = ev?.people ? `${ev.people}名` : "予定";
-    const nights = getStayNights(ev);
-
-    return nights > 0 ? `${people}（${nights}日）` : people;
-  }
-
-  function getStayNights(ev) {
+  function getStayDays(ev) {
     if (!ev || !ev.date || !ev.stayEndDate) return 0;
 
-    const start = parseLocalDate(ev.date);
+    const startDateStr = getStayStartDate(ev);
+    const start = parseLocalDate(startDateStr);
     const end = parseLocalDate(ev.stayEndDate);
     if (!start || !end || end < start) return 0;
 
-    // 連泊終了日も含めて数える。
-    // 例：開始日～終了日が5日分なら「5日」と表示する。
+    // 現在表示中の日付ではなく、連泊開始日～終了日で固定計算する。
+    // 例：開始日～終了日が5日分なら、どのセルでも「5日」と表示する。
     return Math.round((startOfDay(end) - startOfDay(start)) / 86400000) + 1;
+  }
+
+  function getStayStartDate(ev) {
+    if (!ev) return "";
+
+    // 新形式データは保存時の開始日をそのまま使う
+    if (ev.stayStartDate) return ev.stayStartDate;
+
+    // 古いバックアップ・既存データ用：
+    // 同じ連泊イベントが前日に続いていれば、先頭までさかのぼる
+    let dateStr = ev.date || "";
+    let current = ev;
+
+    while (dateStr) {
+      const prevDate = addDays(dateStr, -1);
+      const prev = getEvent(prevDate, ev.itemId);
+
+      if (!isSameStayEvent(current, prev)) break;
+
+      dateStr = prevDate;
+      current = prev;
+    }
+
+    return dateStr || ev.date || "";
   }
 
   function makeStayKey(ev) {
     return [
       ev?.itemId || "",
+      ev?.stayStartDate || getStayStartDate(ev) || "",
       ev?.stayEndDate || "",
       ev?.people || "",
       ev?.user || "",
@@ -1888,7 +1929,8 @@
 
     return `
       <div class="mini-card ${segmentClass}" style="--card-color:${escapeAttr(color)}">
-        ${ev.people ? `<div class="mini-content">${escapeHtml(formatPeopleWithStay(ev))}</div>` : `<div class="mini-content mini-placeholder">予定</div>`}
+        ${ev.people ? `<div class="mini-content">${escapeHtml(ev.people)}名</div>` : `<div class="mini-content mini-placeholder">予定</div>`}
+        ${getStayDays(ev) > 0 ? `<div class="mini-stay-days">${escapeHtml(getStayDays(ev))}日</div>` : ""}
         ${ev.user ? `<div class="mini-line">${escapeHtml(formatUserName(ev.user))}</div>` : ""}
       </div>
     `;
@@ -1936,6 +1978,7 @@
       state.events[eventKey(startDateStr, itemId)] = {
         ...baseEv,
         date: startDateStr,
+        stayStartDate: "",
         stayEndDate: ""
       };
       return;
@@ -1946,33 +1989,53 @@
       state.events[eventKey(dateStr, itemId)] = {
         ...baseEv,
         date: dateStr,
+        stayStartDate: startDateStr,
         stayEndDate: endDateStr
       };
     }
   }
 
-  function formatPeopleWithStay(ev) {
-    const people = ev?.people ? `${ev.people}名` : "予定";
-    const nights = getStayNights(ev);
-
-    return nights > 0 ? `${people}（${nights}日）` : people;
-  }
-
-  function getStayNights(ev) {
+  function getStayDays(ev) {
     if (!ev || !ev.date || !ev.stayEndDate) return 0;
 
-    const start = parseLocalDate(ev.date);
+    const startDateStr = getStayStartDate(ev);
+    const start = parseLocalDate(startDateStr);
     const end = parseLocalDate(ev.stayEndDate);
     if (!start || !end || end < start) return 0;
 
-    // 連泊終了日も含めて数える。
-    // 例：開始日～終了日が5日分なら「5日」と表示する。
+    // 現在表示中の日付ではなく、連泊開始日～終了日で固定計算する。
+    // 例：開始日～終了日が5日分なら、どのセルでも「5日」と表示する。
     return Math.round((startOfDay(end) - startOfDay(start)) / 86400000) + 1;
+  }
+
+  function getStayStartDate(ev) {
+    if (!ev) return "";
+
+    // 新形式データは保存時の開始日をそのまま使う
+    if (ev.stayStartDate) return ev.stayStartDate;
+
+    // 古いバックアップ・既存データ用：
+    // 同じ連泊イベントが前日に続いていれば、先頭までさかのぼる
+    let dateStr = ev.date || "";
+    let current = ev;
+
+    while (dateStr) {
+      const prevDate = addDays(dateStr, -1);
+      const prev = getEvent(prevDate, ev.itemId);
+
+      if (!isSameStayEvent(current, prev)) break;
+
+      dateStr = prevDate;
+      current = prev;
+    }
+
+    return dateStr || ev.date || "";
   }
 
   function makeStayKey(ev) {
     return [
       ev?.itemId || "",
+      ev?.stayStartDate || getStayStartDate(ev) || "",
       ev?.stayEndDate || "",
       ev?.people || "",
       ev?.user || "",
