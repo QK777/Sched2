@@ -1559,9 +1559,11 @@
 
     const start = parseLocalDate(ev.date);
     const end = parseLocalDate(ev.stayEndDate);
-    if (!start || !end || end <= start) return 0;
+    if (!start || !end || end < start) return 0;
 
-    return Math.round((startOfDay(end) - startOfDay(start)) / 86400000);
+    // 連泊終了日も含めて数える。
+    // 例：開始日～終了日が5日分なら「5泊」と表示する。
+    return Math.round((startOfDay(end) - startOfDay(start)) / 86400000) + 1;
   }
 
   function makeStayKey(ev) {
@@ -1961,9 +1963,11 @@
 
     const start = parseLocalDate(ev.date);
     const end = parseLocalDate(ev.stayEndDate);
-    if (!start || !end || end <= start) return 0;
+    if (!start || !end || end < start) return 0;
 
-    return Math.round((startOfDay(end) - startOfDay(start)) / 86400000);
+    // 連泊終了日も含めて数える。
+    // 例：開始日～終了日が5日分なら「5泊」と表示する。
+    return Math.round((startOfDay(end) - startOfDay(start)) / 86400000) + 1;
   }
 
   function makeStayKey(ev) {
