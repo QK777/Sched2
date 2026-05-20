@@ -381,7 +381,7 @@
     .mini-content {
       position: relative;
       z-index: 1;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 950;
       line-height: 1;
       white-space: nowrap;
@@ -1292,6 +1292,9 @@
         </div>
       </div>
 
+      <label>場所</label>
+      <select id="activityPlaceInput"></select>
+
       <label>内容</label>
       <div class="select-add-row">
         <select id="activityContentInput"></select>
@@ -1402,17 +1405,18 @@
   const activityEditor       = document.getElementById("activityEditor");
   const activityStartInput   = document.getElementById("activityStartInput");
   const activityEndInput     = document.getElementById("activityEndInput");
+  const activityPlaceInput   = document.getElementById("activityPlaceInput");
   const activityContentInput = document.getElementById("activityContentInput");
   const activityStaffInput   = document.getElementById("activityStaffInput");
   const activityStaffTags    = document.getElementById("activityStaffTags");
   const activityDuration     = null;
 
   activityStartInput.addEventListener("focus", () => {
-    if (!activityStartInput.value) activityStartInput.value = "09:00";
+    if (!activityStartInput.value) activityStartInput.value = "10:00";
   });
 
   activityEndInput.addEventListener("focus", () => {
-    if (!activityEndInput.value) activityEndInput.value = "09:00";
+    if (!activityEndInput.value) activityEndInput.value = "10:00";
   });
 
   activityStartInput.addEventListener("input", updateActivityDuration);
@@ -1541,6 +1545,23 @@
         stayEndDate: endDateStr
       };
     }
+  }
+
+  function formatPeopleWithStay(ev) {
+    const people = ev?.people ? `${ev.people}名` : "予定";
+    const nights = getStayNights(ev);
+
+    return nights > 0 ? `${people}（${nights}泊）` : people;
+  }
+
+  function getStayNights(ev) {
+    if (!ev || !ev.date || !ev.stayEndDate) return 0;
+
+    const start = parseLocalDate(ev.date);
+    const end = parseLocalDate(ev.stayEndDate);
+    if (!start || !end || end <= start) return 0;
+
+    return Math.round((startOfDay(end) - startOfDay(start)) / 86400000);
   }
 
   function makeStayKey(ev) {
@@ -1865,7 +1886,7 @@
 
     return `
       <div class="mini-card ${segmentClass}" style="--card-color:${escapeAttr(color)}">
-        ${ev.people ? `<div class="mini-content">${escapeHtml(ev.people)}名</div>` : `<div class="mini-content mini-placeholder">予定</div>`}
+        ${ev.people ? `<div class="mini-content">${escapeHtml(formatPeopleWithStay(ev))}</div>` : `<div class="mini-content mini-placeholder">予定</div>`}
         ${ev.user ? `<div class="mini-line">${escapeHtml(formatUserName(ev.user))}</div>` : ""}
       </div>
     `;
@@ -1926,6 +1947,23 @@
         stayEndDate: endDateStr
       };
     }
+  }
+
+  function formatPeopleWithStay(ev) {
+    const people = ev?.people ? `${ev.people}名` : "予定";
+    const nights = getStayNights(ev);
+
+    return nights > 0 ? `${people}（${nights}泊）` : people;
+  }
+
+  function getStayNights(ev) {
+    if (!ev || !ev.date || !ev.stayEndDate) return 0;
+
+    const start = parseLocalDate(ev.date);
+    const end = parseLocalDate(ev.stayEndDate);
+    if (!start || !end || end <= start) return 0;
+
+    return Math.round((startOfDay(end) - startOfDay(start)) / 86400000);
   }
 
   function makeStayKey(ev) {
@@ -2139,6 +2177,7 @@
             id: x.id || makeId("act"),
             start: x.start || "",
             end: x.end || "",
+            placeId: x.placeId || "",
             content: x.content || "",
             staffs,
             staff: staffs.join("、")
@@ -2152,6 +2191,7 @@
         id: value.id || makeId("act"),
         start: value.start || "",
         end: value.end || "",
+        placeId: value.placeId || "",
         content: value.content || "",
         staffs,
         staff: staffs.join("、")
@@ -2172,7 +2212,7 @@
 
     activityList.innerHTML = entries.map(entry => {
       const duration = formatDuration(entry.start, entry.end);
-      const meta = [entry.content, formatStaffs(entry)].filter(Boolean).join(" / ");
+      const meta = [formatActivityPlaceLabel(entry.placeId), entry.content, formatStaffs(entry)].filter(Boolean).join(" / ");
       return `
         <div class="activity-list-card" data-id="${escapeAttr(entry.id)}">
           <button class="activity-list-main" type="button" data-id="${escapeAttr(entry.id)}">
@@ -2204,16 +2244,18 @@
   function openActivityEntryEditor(entry = null) {
     const editing = entry || {
       id: makeId("act"),
-      start: "09:00",
-      end: "09:00",
+      start: "10:00",
+      end: "10:00",
+      placeId: "",
       content: "",
       staffs: [],
       staff: ""
     };
 
     activityEditingId.value = editing.id;
-    activityStartInput.value = editing.start || "09:00";
-    activityEndInput.value = editing.end || "09:00";
+    activityStartInput.value = editing.start || "10:00";
+    activityEndInput.value = editing.end || "10:00";
+    renderActivityPlaceOptions(editing.placeId || "");
     renderActivityContentOptions(editing.content || "");
     activitySelectedStaffs = normalizeStaffList(editing.staffs ?? editing.staff);
     renderActivityStaffOptions("");
@@ -2244,6 +2286,7 @@
         id,
         start: activityStartInput.value,
         end: activityEndInput.value,
+        placeId: activityPlaceInput.value,
         content: activityContentInput.value,
         staffs: activitySelectedStaffs.slice(),
         staff: activitySelectedStaffs.join("、")
@@ -2294,6 +2337,32 @@
     saveState();
     closeActivitySheet();
     renderCalendar(false);
+  }
+
+  function renderActivityPlaceOptions(value = "") {
+    const options = state.items
+      .filter(item => item.type !== "activity")
+      .map(item => ({
+        id: item.id,
+        label: formatActivityPlaceOption(item)
+      }));
+
+    activityPlaceInput.innerHTML = `<option value="">選択してください</option>` +
+      options.map(opt => `<option value="${escapeAttr(opt.id)}">${escapeHtml(opt.label)}</option>`).join("");
+
+    activityPlaceInput.value = value || "";
+  }
+
+  function formatActivityPlaceOption(item) {
+    const main = getTopDisplayName(item) || item.name || "";
+    const sub = item.sub ? `（${item.sub}）` : "";
+    return `${main}${sub}`;
+  }
+
+  function formatActivityPlaceLabel(placeId) {
+    if (!placeId) return "";
+    const item = state.items.find(x => x.id === placeId);
+    return item ? formatActivityPlaceOption(item) : "";
   }
 
   function renderActivityContentOptions(value = "") {
