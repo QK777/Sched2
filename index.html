@@ -1551,7 +1551,7 @@
     const people = ev?.people ? `${ev.people}名` : "予定";
     const nights = getStayNights(ev);
 
-    return nights > 0 ? `${people}（${nights}泊）` : people;
+    return nights > 0 ? `${people}（${nights}日）` : people;
   }
 
   function getStayNights(ev) {
@@ -1562,7 +1562,7 @@
     if (!start || !end || end < start) return 0;
 
     // 連泊終了日も含めて数える。
-    // 例：開始日～終了日が5日分なら「5泊」と表示する。
+    // 例：開始日～終了日が5日分なら「5日」と表示する。
     return Math.round((startOfDay(end) - startOfDay(start)) / 86400000) + 1;
   }
 
@@ -1955,7 +1955,7 @@
     const people = ev?.people ? `${ev.people}名` : "予定";
     const nights = getStayNights(ev);
 
-    return nights > 0 ? `${people}（${nights}泊）` : people;
+    return nights > 0 ? `${people}（${nights}日）` : people;
   }
 
   function getStayNights(ev) {
@@ -1966,7 +1966,7 @@
     if (!start || !end || end < start) return 0;
 
     // 連泊終了日も含めて数える。
-    // 例：開始日～終了日が5日分なら「5泊」と表示する。
+    // 例：開始日～終了日が5日分なら「5日」と表示する。
     return Math.round((startOfDay(end) - startOfDay(start)) / 86400000) + 1;
   }
 
